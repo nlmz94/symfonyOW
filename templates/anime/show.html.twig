@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ anime.title }}{% endblock %}
+
+{% block body %}
+    <a href="{{ path('app_anime') }}">&larr; Back to list</a>
+
+    <h1 class="mt-3">{{ anime.title }}</h1>
+    {% if anime.titleEnglish %}<h2 class="h5 text-muted">{{ anime.titleEnglish }}</h2>{% endif %}
+
+    {% if anime.imgUrl %}
+        <p><img src="{{ anime.imgUrl }}" alt="{{ anime.title }}" style="max-width: 300px;"></p>
+    {% endif %}
+
+    <ul>
+        {% if anime.episodes is not null %}<li>Episodes: {{ anime.episodes }}</li>{% endif %}
+        {% if anime.airing %}<li>Airing: {{ anime.airing }}</li>{% endif %}
+        {% if anime.aired is not null %}<li>Aired: {{ anime.aired ? 'Yes' : 'No' }}</li>{% endif %}
+        {% if anime.pegi %}<li>PEGI: {{ anime.pegi.pegi }}</li>{% endif %}
+    </ul>
+
+    {% if anime.synopsis %}
+        <h3>Synopsis</h3>
+        <p>{{ anime.synopsis }}</p>
+    {% endif %}
+
+    {% if anime.genres|length > 0 %}
+        <h3>Genres</h3>
+        <ul>
+            {% for g in anime.genres %}<li>{{ g.name }}</li>{% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if anime.producers|length > 0 %}
+        <h3>Producers</h3>
+        <ul>
+            {% for p in anime.producers %}<li>{{ p.name }}</li>{% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if anime.studios|length > 0 %}
+        <h3>Studios</h3>
+        <ul>
+            {% for s in anime.studios %}<li>{{ s.name }}</li>{% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}

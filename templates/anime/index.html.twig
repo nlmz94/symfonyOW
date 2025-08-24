@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Anime (page {{ page }}){% endblock %}
+
+{% block body %}
+    <h1 class="mb-3">Anime</h1>
+
+    <p class="text-muted">Total: {{ total }} • Page {{ page }} of {{ pages }}</p>
+
+    <ul>
+        {% for anime in animes %}
+            <li>
+                <a href="{{ path('anime_show', { id: anime.id }) }}">
+                    {{ anime.title }}{% if anime.titleEnglish %} <small>({{ anime.titleEnglish }})</small>{% endif %}
+                </a>
+                {% if anime.episodes is not null %} — {{ anime.episodes }} ep.{% endif %}
+                {% if anime.pegi %} — PEGI: {{ anime.pegi.pegi }}{% endif %}
+            </li>
+        {% else %}
+            <li>No anime found.</li>
+        {% endfor %}
+    </ul>
+
+    {% if pages > 1 %}
+        <nav aria-label="Pagination" class="mt-4">
+            <ul class="pagination">
+                <li class="page-item{% if page <= 1 %} disabled{% endif %}">
+                    <a class="page-link" href="{{ path('app_anime', { page: 1 }) }}">&laquo; First</a>
+                </li>
+                <li class="page-item{% if page <= 1 %} disabled{% endif %}">
+                    <a class="page-link" href="{{ path('app_anime', { page: page - 1 }) }}">Prev</a>
+                </li>
+
+                {# show a small window of pages around current #}
+                {% set start = max(1, page - 2) %}
+                {% set end = min(pages, page + 2) %}
+                {% for p in start..end %}
+                    <li class="page-item{% if p == page %} active{% endif %}">
+                        <a class="page-link" href="{{ path('app_anime', { page: p }) }}">{{ p }}</a>
+                    </li>
+                {% endfor %}
+
+                <li class="page-item{% if page >= pages %} disabled{% endif %}">
+                    <a class="page-link" href="{{ path('app_anime', { page: page + 1 }) }}">Next</a>
+                </li>
+                <li class="page-item{% if page >= pages %} disabled{% endif %}">
+                    <a class="page-link" href="{{ path('app_anime', { page: pages }) }}">Last &raquo;</a>
+                </li>
+            </ul>
+        </nav>
+    {% endif %}
+{% endblock %}
