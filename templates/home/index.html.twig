@@ -1,20 +1,233 @@
+{# templates/home/index.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}OnlyWeebs — Discover 22,000+ Anime{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    {# -------------------------------------------
+   DUMMY DATA (replace with real data later)
+   ------------------------------------------- #}
+    {% set trending = [
+        {'id': 1, 'title': 'Demon Slayer: Kimetsu no Yaiba', 'year': 2019, 'genres': ['Action','Fantasy']},
+        {'id': 2, 'title': 'Jujutsu Kaisen', 'year': 2020, 'genres': ['Action','Supernatural']},
+        {'id': 3, 'title': 'Attack on Titan', 'year': 2013, 'genres': ['Action','Drama']},
+        {'id': 4, 'title': 'Spy x Family', 'year': 2022, 'genres': ['Comedy','Slice of Life']}
+    ] %}
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/home/nlmz94/dev/symfonyOW/src/Controller/HomeController.php</code></li>
-        <li>Your template at <code>/home/nlmz94/dev/symfonyOW/templates/home/index.html.twig</code></li>
-    </ul>
-</div>
+    {% set topRated = [
+        {'id': 5, 'title': 'Fullmetal Alchemist: Brotherhood', 'year': 2009, 'genres': ['Action','Adventure']},
+        {'id': 6, 'title': 'Gintama°', 'year': 2015, 'genres': ['Comedy','Action']},
+        {'id': 7, 'title': 'Steins;Gate', 'year': 2011, 'genres': ['Sci-Fi','Thriller']},
+        {'id': 8, 'title': 'Hunter x Hunter', 'year': 2011, 'genres': ['Action','Adventure']}
+    ] %}
+
+    {% set recent = [
+        {'id': 9,  'title': 'Kaiju No. 8', 'year': 2024, 'genres': ['Action','Sci-Fi']},
+        {'id': 10, 'title': 'Frieren: Beyond Journey’s End', 'year': 2023, 'genres': ['Fantasy','Drama']},
+        {'id': 11, 'title': 'Blue Lock', 'year': 2022, 'genres': ['Sports','Drama']},
+        {'id': 12, 'title': 'Chainsaw Man', 'year': 2022, 'genres': ['Action','Horror']}
+    ] %}
+
+    {% set genres = ['Action','Adventure','Comedy','Drama','Fantasy','Horror','Mecha','Mystery','Romance','Sci-Fi','Slice of Life','Sports'] %}
+    {% set studios = ['Bones','Madhouse','MAPPA','ufotable','Wit Studio','A-1 Pictures'] %}
+
+    {# -------------------------------------------
+   HERO / SEARCH
+   ------------------------------------------- #}
+    <section class="py-5">
+        <div class="p-5 rounded-4 bg-body-tertiary border">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-7">
+                    <h1 class="display-5 fw-bold mb-2">Welcome to <span class="text-primary">OnlyWeebs</span></h1>
+                    <p class="lead text-secondary mb-4">Explore <strong>22,000+</strong> anime series and movies. Search, browse, and discover your next obsession.</p>
+
+                    <form class="d-flex" method="get" action="{{ path('app_anime') }}">
+                        <input type="text" class="form-control form-control-lg" name="searchTerm" placeholder="Search anime by title…">
+                        <button class="btn btn-primary btn-lg ms-2" type="submit">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </form>
+
+                    <div class="d-flex flex-wrap gap-3 mt-3 text-muted small">
+                        <div><i class="bi bi-collection-play me-1"></i>22k titles</div>
+                        <div><i class="bi bi-tags me-1"></i>{{ genres|length }} genres</div>
+                        <div><i class="bi bi-building me-1"></i>{{ studios|length }} studios</div>
+                    </div>
+                </div>
+                <div class="col-lg-5 text-center">
+                    <img src="/images/ow-smol-text.webp" class="img-fluid rounded-4 shadow-sm" alt="Featured anime cover" style="max-height: 300px; object-fit: cover;">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# -------------------------------------------
+   TRENDING
+   ------------------------------------------- #}
+    <section class="mb-5">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h2 class="h4 mb-0"><i class="bi bi-fire me-2 text-danger"></i>Trending now</h2>
+            <a href="{{ path('app_anime') }}" class="btn btn-sm btn-outline-secondary">Browse all</a>
+        </div>
+
+        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+            {% for a in trending %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <img src="/images/animes/1_cover.jpg" class="card-img-top" alt="{{ a.title }} cover" style="height: 180px; object-fit: cover;">
+                        <div class="card-body">
+                            <h3 class="h6 card-title mb-1 text-truncate" title="{{ a.title }}">{{ a.title }}</h3>
+                            <div class="text-muted small">{{ a.year }}</div>
+                            <div class="mt-2">
+                                {% for g in a.genres|slice(0,2) %}
+                                    <span class="badge text-bg-secondary me-1">{{ g }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 pt-0 pb-3 px-3">
+                            <a href="#" class="btn btn-sm btn-primary w-100">
+                                <i class="bi bi-info-circle me-1"></i> Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    {# -------------------------------------------
+   TOP RATED
+   ------------------------------------------- #}
+    <section class="mb-5">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h2 class="h4 mb-0"><i class="bi bi-star-fill me-2 text-warning"></i>Highest rated</h2>
+            <a href="{{ path('app_anime') }}" class="btn btn-sm btn-outline-secondary">See rankings</a>
+        </div>
+
+        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+            {% for a in topRated %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <img src="/images/animes/1_cover.jpg" class="card-img-top" alt="{{ a.title }} cover" style="height: 180px; object-fit: cover;">
+                        <div class="card-body">
+                            <h3 class="h6 card-title mb-1 text-truncate" title="{{ a.title }}">{{ a.title }}</h3>
+                            <div class="text-muted small">{{ a.year }}</div>
+                            <div class="mt-2">
+                                {% for g in a.genres|slice(0,2) %}
+                                    <span class="badge text-bg-secondary me-1">{{ g }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 pt-0 pb-3 px-3">
+                            <a href="#" class="btn btn-sm btn-outline-primary w-100">
+                                <i class="bi bi-bookmark-plus me-1"></i> Add to list
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    {# -------------------------------------------
+   RECENTLY ADDED
+   ------------------------------------------- #}
+    <section class="mb-5">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h2 class="h4 mb-0"><i class="bi bi-clock-history me-2"></i>Recently added</h2>
+            <a href="{{ path('app_anime') }}" class="btn btn-sm btn-outline-secondary">View all</a>
+        </div>
+
+        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+            {% for a in recent %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <img src="/images/animes/1_cover.jpg" class="card-img-top" alt="{{ a.title }} cover" style="height: 180px; object-fit: cover;">
+                        <div class="card-body">
+                            <h3 class="h6 card-title mb-1 text-truncate" title="{{ a.title }}">{{ a.title }}</h3>
+                            <div class="text-muted small">{{ a.year }}</div>
+                            <div class="mt-2">
+                                {% for g in a.genres|slice(0,2) %}
+                                    <span class="badge text-bg-secondary me-1">{{ g }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 pt-0 pb-3 px-3">
+                            <a href="#" class="btn btn-sm btn-outline-secondary w-100">
+                                <i class="bi bi-eye me-1"></i> Preview
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    {# -------------------------------------------
+   QUICK BROWSE
+   ------------------------------------------- #}
+    <section class="mb-5">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-3"><i class="bi bi-tags me-2"></i>Browse by genre</h2>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for g in genres %}
+                                <a class="btn btn-sm btn-outline-secondary" href="{{ path('app_anime', { genre: g }) }}">{{ g }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-3"><i class="bi bi-building me-2"></i>Browse by studio</h2>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for s in studios %}
+                                <a class="btn btn-sm btn-outline-secondary" href="{{ path('app_anime', { studio: s }) }}">{{ s }}</a>
+                            {% endfor %}
+                        </div>
+                        <hr>
+                        <a class="btn btn-sm btn-outline-primary" href="{{ path('app_anime', { sort: 'year_desc' }) }}">
+                            <i class="bi bi-calendar3 me-1"></i> Newest first
+                        </a>
+                        <a class="btn btn-sm btn-outline-primary ms-2" href="{{ path('app_anime', { sort: 'rating_desc' }) }}">
+                            <i class="bi bi-star me-1"></i> Top rated
+                        </a>
+                        <a class="btn btn-sm btn-outline-primary ms-2" href="{{ path('app_anime', { random: 1 }) }}">
+                            <i class="bi bi-shuffle me-1"></i> Random
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# -------------------------------------------
+   CTA (ACCOUNT PROMPT)
+   ------------------------------------------- #}
+    <section class="mb-5">
+        <div class="p-4 p-md-5 rounded-4 border text-center">
+            {% if app.user %}
+                <h2 class="h4 mb-2">Welcome back, {{ app.user.email }}!</h2>
+                <p class="text-secondary mb-3">Jump back into discovery — new titles are added every week.</p>
+                <a href="{{ path('app_anime') }}" class="btn btn-primary">
+                    <i class="bi bi-search-heart me-1"></i> Explore now
+                </a>
+            {% else %}
+                <h2 class="h4 mb-2">Create a free account</h2>
+                <p class="text-secondary mb-3">Track favorites, rate shows, and build your watchlist.</p>
+                <a href="{{ path('app_register') }}" class="btn btn-success me-2">
+                    <i class="bi bi-person-plus-fill me-1"></i> Register
+                </a>
+                <a href="{{ path('app_login') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Login
+                </a>
+            {% endif %}
+        </div>
+    </section>
+
 {% endblock %}

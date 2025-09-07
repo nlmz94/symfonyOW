@@ -9,7 +9,10 @@
         <div class="col-12 col-md-4">
             <div class="card">
                 {% if anime.imgUrl %}
-                    <img src="{{ anime.imgUrl }}" class="card-img-top" alt="{{ anime.title }}">
+                    <picture>
+                        <source srcset="{{ anime.imgUrl| imagine_filter('poster_webp') }}" type="image/webp">
+                        <img src="{{ anime.imgUrl | imagine_filter('poster') }}" class="card-img-top" alt="{{ anime.title }}">
+                    </picture>
                 {% endif %}
                 <div class="card-body">
                     <h1 class="h4 card-title mb-1">{{ anime.title }}</h1>

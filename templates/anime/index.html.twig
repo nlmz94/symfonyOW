@@ -27,7 +27,10 @@
                 <a class="list-group-item list-group-item-action d-flex gap-3 align-items-start"
                    href="{{ path('anime_show', { id: a.id }) }}">
                     {% if a.imgUrl %}
-                        <img src="{{ a.imgUrl }}" alt="{{ a.title }}" class="rounded" style="width:60px;height:60px;object-fit:cover;">
+                        <picture>
+                            <source srcset="{{ a.imgUrl | imagine_filter('thumb_webp') }}" type="image/webp">
+                            <img src="{{ a.imgUrl | imagine_filter('thumb') }}" alt="{{ a.title }}" class="rounded">
+                        </picture>
                     {% endif %}
                     <div class="flex-grow-1">
                         <div class="fw-semibold">
