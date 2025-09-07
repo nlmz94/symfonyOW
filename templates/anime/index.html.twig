@@ -10,8 +10,11 @@
         </div>
         <form method="get" class="d-none d-md-block">
             <div class="input-group">
-                <input type="text" class="form-control" name="q" value="{{ app.request.get('q') }}" placeholder="Search title…">
-                <button class="btn btn-outline-secondary" type="submit">Search</button>
+                <input type="text" class="form-control" name="searchTerm" value="{{ app.request.get('searchTerm') }}" placeholder="Search title…">
+                <button class="btn btn-outline-secondary" type="submit"
+                        href="{{ path('app_anime', app.request.query.all) }}">
+                    Search
+                </button>
             </div>
         </form>
     </div>

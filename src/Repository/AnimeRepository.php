@@ -20,7 +20,7 @@ class AnimeRepository extends ServiceEntityRepository
     /**
      * @return array{items: list<Anime>, total: int, pages: int, page: int, limit: int}
      */
-    public function paginateAll(int $page = 1, ?int $limit = 50): array
+    public function paginateAll(int $page = 1, ?string $searchTerm = null, ?int $limit = 50): array
     {
         $page = max(1, $page);
         $qb = $this->createQueryBuilder('a')
@@ -28,8 +28,14 @@ class AnimeRepository extends ServiceEntityRepository
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
 
-        $paginator = new Paginator($qb->getQuery(), true);
+        if ($searchTerm !== null && $searchTerm !== '') {
+            error_log(var_export('%'.$searchTerm.'%', true));
+            $qb->andWhere('LOWER(a.title) LIKE LOWER(:searchTerm)')
+                ->andWhere('LOWER(a.titleEnglish) LIKE LOWER(:searchTerm)')
+                ->setParameter('searchTerm', '%'.$searchTerm.'%');
+        }
 
+        $paginator = new Paginator($qb->getQuery(), true);
         $total = count($paginator);
         $pages = (int) max(1, ceil($total / $limit));
         $animes = [];

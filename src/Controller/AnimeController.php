@@ -15,7 +15,8 @@ final class AnimeController extends AbstractController
     public function index(Request $request, AnimeRepository $repo): Response
     {
         $page  = max(1, $request->query->getInt('page', 1));
-        $data = $repo->paginateAll($page);
+        $searchTerm = $request->query->get('searchTerm');
+        $data = $repo->paginateAll($page, $searchTerm);
 
         return $this->render('anime/index.html.twig', $data);
     }
