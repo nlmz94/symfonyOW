@@ -40,6 +40,7 @@
         "symfony/twig-bundle": "7.3.*",
         "symfony/ux-turbo": "^2.29",
         "symfony/validator": "7.3.*",
+        "symfony/var-exporter": "^7.3",
         "symfony/web-link": "7.3.*",
         "symfony/yaml": "7.3.*",
         "twig/extra-bundle": "^3.0",
