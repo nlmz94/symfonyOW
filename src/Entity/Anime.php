@@ -26,7 +26,10 @@ class Anime
     private ?string $synopsis = null;
 
     #[ORM\Column(name: 'img_url', length: 1024, nullable: true)]
-    private ?string $imgUrl = null;
+    private ?string $imgUrl = null;         // NEW local path (/images/animes/123_cover.jpg)
+
+    #[ORM\Column(name: 'old_img_url', length: 1024, nullable: true)]
+    private ?string $oldImgUrl = null;      // ORIGINAL remote URL
 
     #[ORM\Column(name: 'episodes', type: 'integer', nullable: true)]
     private ?int $episodes = null;
@@ -79,6 +82,9 @@ class Anime
 
     public function getImgUrl(): ?string { return $this->imgUrl; }
     public function setImgUrl(?string $imgUrl): self { $this->imgUrl = $imgUrl; return $this; }
+
+    public function getOldImgUrl(): ?string { return $this->oldImgUrl; }
+    public function setOldImgUrl(?string $old): self { $this->oldImgUrl = $old; return $this; }
 
     public function getEpisodes(): ?int { return $this->episodes; }
     public function setEpisodes(?int $episodes): self { $this->episodes = $episodes; return $this; }

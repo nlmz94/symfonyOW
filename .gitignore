@@ -19,3 +19,5 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+/public/images/animes/
+/public/images/.DS_Store

@@ -3,48 +3,71 @@
 {% block title %}Anime (page {{ page }}){% endblock %}
 
 {% block body %}
-    <h1 class="mb-3">Anime</h1>
+    <div class="d-flex align-items-end justify-content-between mb-3">
+        <div>
+            <h1 class="h3 mb-1">Anime</h1>
+            <div class="text-muted small">Total: {{ total }} • Page {{ page }} of {{ pages }}</div>
+        </div>
+        <form method="get" class="d-none d-md-block">
+            <div class="input-group">
+                <input type="text" class="form-control" name="q" value="{{ app.request.get('q') }}" placeholder="Search title…">
+                <button class="btn btn-outline-secondary" type="submit">Search</button>
+            </div>
+        </form>
+    </div>
 
-    <p class="text-muted">Total: {{ total }} • Page {{ page }} of {{ pages }}</p>
-
-    <ul>
-        {% for anime in animes %}
-            <li>
-                <a href="{{ path('anime_show', { id: anime.id }) }}">
-                    {{ anime.title }}{% if anime.titleEnglish %} <small>({{ anime.titleEnglish }})</small>{% endif %}
+    {% if animes is empty %}
+        <div class="alert alert-info">No anime found.</div>
+    {% else %}
+        <div class="list-group">
+            {% for a in animes %}
+                <a class="list-group-item list-group-item-action d-flex gap-3 align-items-start"
+                   href="{{ path('anime_show', { id: a.id }) }}">
+                    {% if a.imgUrl %}
+                        <img src="{{ a.imgUrl }}" alt="{{ a.title }}" class="rounded" style="width:60px;height:60px;object-fit:cover;">
+                    {% endif %}
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold">
+                            {{ a.title }}
+                            {% if a.titleEnglish %}<span class="text-muted">({{ a.titleEnglish }})</span>{% endif %}
+                        </div>
+                        <div class="small text-muted">
+                            {% if a.episodes is not null %}{{ a.episodes }} ep • {% endif %}
+                            {% if a.pegi %}PEGI {{ a.pegi.pegi }} • {% endif %}
+                            {% if a.genres|length > 0 %}
+                                {{ a.genres|slice(0,3)|map(g => g.name)|join(', ') }}{% if a.genres|length > 3 %}…{% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <span class="badge text-bg-light align-self-center">#{{ a.id }}</span>
                 </a>
-                {% if anime.episodes is not null %} — {{ anime.episodes }} ep.{% endif %}
-                {% if anime.pegi %} — PEGI: {{ anime.pegi.pegi }}{% endif %}
-            </li>
-        {% else %}
-            <li>No anime found.</li>
-        {% endfor %}
-    </ul>
+            {% endfor %}
+        </div>
+    {% endif %}
 
     {% if pages > 1 %}
         <nav aria-label="Pagination" class="mt-4">
-            <ul class="pagination">
-                <li class="page-item{% if page <= 1 %} disabled{% endif %}">
-                    <a class="page-link" href="{{ path('app_anime', { page: 1 }) }}">&laquo; First</a>
+            <ul class="pagination justify-content-center">
+                <li class="page-item {{ page <= 1 ? 'disabled' }}">
+                    <a class="page-link" href="{{ path('app_anime', app.request.query.all|merge({page: 1})) }}">&laquo; First</a>
                 </li>
-                <li class="page-item{% if page <= 1 %} disabled{% endif %}">
-                    <a class="page-link" href="{{ path('app_anime', { page: page - 1 }) }}">Prev</a>
+                <li class="page-item {{ page <= 1 ? 'disabled' }}">
+                    <a class="page-link" href="{{ path('app_anime', app.request.query.all|merge({page: page - 1})) }}">Prev</a>
                 </li>
 
-                {# show a small window of pages around current #}
                 {% set start = max(1, page - 2) %}
                 {% set end = min(pages, page + 2) %}
                 {% for p in start..end %}
-                    <li class="page-item{% if p == page %} active{% endif %}">
-                        <a class="page-link" href="{{ path('app_anime', { page: p }) }}">{{ p }}</a>
+                    <li class="page-item {{ p == page ? 'active' }}">
+                        <a class="page-link" href="{{ path('app_anime', app.request.query.all|merge({page: p})) }}">{{ p }}</a>
                     </li>
                 {% endfor %}
 
-                <li class="page-item{% if page >= pages %} disabled{% endif %}">
-                    <a class="page-link" href="{{ path('app_anime', { page: page + 1 }) }}">Next</a>
+                <li class="page-item {{ page >= pages ? 'disabled' }}">
+                    <a class="page-link" href="{{ path('app_anime', app.request.query.all|merge({page: page + 1})) }}">Next</a>
                 </li>
-                <li class="page-item{% if page >= pages %} disabled{% endif %}">
-                    <a class="page-link" href="{{ path('app_anime', { page: pages }) }}">Last &raquo;</a>
+                <li class="page-item {{ page >= pages ? 'disabled' }}">
+                    <a class="page-link" href="{{ path('app_anime', app.request.query.all|merge({page: pages})) }}">Last &raquo;</a>
                 </li>
             </ul>
         </nav>

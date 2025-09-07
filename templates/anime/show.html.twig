@@ -3,45 +3,61 @@
 {% block title %}{{ anime.title }}{% endblock %}
 
 {% block body %}
-    <a href="{{ path('app_anime') }}">&larr; Back to list</a>
+    <a href="{{ path('app_anime') }}" class="btn btn-link p-0 mb-3">&larr; Back to list</a>
 
-    <h1 class="mt-3">{{ anime.title }}</h1>
-    {% if anime.titleEnglish %}<h2 class="h5 text-muted">{{ anime.titleEnglish }}</h2>{% endif %}
+    <div class="row g-4">
+        <div class="col-12 col-md-4">
+            <div class="card">
+                {% if anime.imgUrl %}
+                    <img src="{{ anime.imgUrl }}" class="card-img-top" alt="{{ anime.title }}">
+                {% endif %}
+                <div class="card-body">
+                    <h1 class="h4 card-title mb-1">{{ anime.title }}</h1>
+                    {% if anime.titleEnglish %}<div class="text-muted small">{{ anime.titleEnglish }}</div>{% endif %}
+                    <ul class="list-unstyled small mt-3 mb-0">
+                        {% if anime.episodes is not null %}<li><strong>Episodes:</strong> {{ anime.episodes }}</li>{% endif %}
+                        {% if anime.airing %}<li><strong>Airing:</strong> {{ anime.airing }}</li>{% endif %}
+                        {% if anime.aired is not null %}<li><strong>Aired:</strong> {{ anime.aired ? 'Yes' : 'No' }}</li>{% endif %}
+                        {% if anime.pegi %}<li><strong>PEGI:</strong> {{ anime.pegi.pegi }}</li>{% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
 
-    {% if anime.imgUrl %}
-        <p><img src="{{ anime.imgUrl }}" alt="{{ anime.title }}" style="max-width: 300px;"></p>
-    {% endif %}
+        <div class="col-12 col-md-8">
+            {% if anime.synopsis %}
+                <div class="mb-4">
+                    <h2 class="h5">Synopsis</h2>
+                    <p class="mb-0">{{ anime.synopsis }}</p>
+                </div>
+            {% endif %}
 
-    <ul>
-        {% if anime.episodes is not null %}<li>Episodes: {{ anime.episodes }}</li>{% endif %}
-        {% if anime.airing %}<li>Airing: {{ anime.airing }}</li>{% endif %}
-        {% if anime.aired is not null %}<li>Aired: {{ anime.aired ? 'Yes' : 'No' }}</li>{% endif %}
-        {% if anime.pegi %}<li>PEGI: {{ anime.pegi.pegi }}</li>{% endif %}
-    </ul>
+            {% if anime.genres|length > 0 %}
+                <div class="mb-3">
+                    <h3 class="h6 text-uppercase text-muted">Genres</h3>
+                    {% for g in anime.genres %}
+                        <span class="badge text-bg-secondary me-1 mb-1">{{ g.name }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
 
-    {% if anime.synopsis %}
-        <h3>Synopsis</h3>
-        <p>{{ anime.synopsis }}</p>
-    {% endif %}
+            {% if anime.producers|length > 0 %}
+                <div class="mb-3">
+                    <h3 class="h6 text-uppercase text-muted">Producers</h3>
+                    {% for p in anime.producers %}
+                        <span class="badge text-bg-light border me-1 mb-1">{{ p.name }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
 
-    {% if anime.genres|length > 0 %}
-        <h3>Genres</h3>
-        <ul>
-            {% for g in anime.genres %}<li>{{ g.name }}</li>{% endfor %}
-        </ul>
-    {% endif %}
-
-    {% if anime.producers|length > 0 %}
-        <h3>Producers</h3>
-        <ul>
-            {% for p in anime.producers %}<li>{{ p.name }}</li>{% endfor %}
-        </ul>
-    {% endif %}
-
-    {% if anime.studios|length > 0 %}
-        <h3>Studios</h3>
-        <ul>
-            {% for s in anime.studios %}<li>{{ s.name }}</li>{% endfor %}
-        </ul>
-    {% endif %}
+            {% if anime.studios|length > 0 %}
+                <div class="mb-3">
+                    <h3 class="h6 text-uppercase text-muted">Studios</h3>
+                    {% for s in anime.studios %}
+                        <span class="badge text-bg-light border me-1 mb-1">{{ s.name }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}
