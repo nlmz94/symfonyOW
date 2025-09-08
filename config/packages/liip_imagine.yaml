@@ -21,6 +21,12 @@ liip_imagine:
             filters:
                 thumbnail: { size: [60, 60], mode: outbound }
 
+        # Profile size (150x150)
+        profile:
+            quality: 80
+            filters:
+                thumbnail: { size: [ 150, 150 ], mode: outbound }
+
         poster_webp:
             format: webp
             quality: 80
@@ -32,3 +38,9 @@ liip_imagine:
             quality: 60
             filters:
                 thumbnail: { size: [60, 60], mode: outbound }
+
+        profile_webp:
+            format: webp
+            quality: 60
+            filters:
+                thumbnail: { size: [ 150, 150 ], mode: outbound }
