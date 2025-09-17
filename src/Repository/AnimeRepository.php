@@ -35,7 +35,9 @@ class AnimeRepository extends ServiceEntityRepository
                 ->setParameter('searchTerm', '%'.$searchTerm.'%');
         }
 
-        $paginator = new Paginator($qb->getQuery(), true);
+        $query = $qb->getQuery();
+        $query->enableResultCache(36000);
+        $paginator = new Paginator($query, true);
         $total = count($paginator);
         $pages = (int) max(1, ceil($total / $limit));
         $animes = [];

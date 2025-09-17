@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AnimeRepository::class)]
 #[ORM\Table(name: 'anime')]
+#[ORM\Cache("NONSTRICT_READ_WRITE")]
 class Anime
 {
     #[ORM\Id]
