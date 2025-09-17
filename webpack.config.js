@@ -14,7 +14,14 @@ Encore
     // only needed for CDN's or subdirectory deploy
     //.setManifestKeyPrefix('build/')
 
-    .enableSassLoader()
+    .enableSassLoader(options => {
+        options.sassOptions = {
+            // Hide deprecation warnings coming from node_modules
+            quietDeps: true,
+            // Optional: target specific warning categories
+            silenceDeprecations: ['import', 'color-functions']
+        };
+    })
 
     /*
      * ENTRY CONFIG
