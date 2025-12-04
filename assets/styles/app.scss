@@ -1,5 +1,32 @@
-// Import Bootstrap CSS (customizable via SCSS)
-@import "~bootstrap/scss/bootstrap";
+// Bootstrap Required
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/maps"; // Required for $theme-colors-rgb
+@import "~bootstrap/scss/mixins";
+@import "~bootstrap/scss/root";
+
+// Bootstrap Optional - Only components used
+@import "~bootstrap/scss/reboot";
+@import "~bootstrap/scss/type";
+@import "~bootstrap/scss/grid";
+@import "~bootstrap/scss/containers";
+@import "~bootstrap/scss/transitions";
+@import "~bootstrap/scss/forms";
+@import "~bootstrap/scss/buttons";
+@import "~bootstrap/scss/nav";
+@import "~bootstrap/scss/navbar";
+@import "~bootstrap/scss/card";
+@import "~bootstrap/scss/badge";
+@import "~bootstrap/scss/alert";
+@import "~bootstrap/scss/pagination";
+@import "~bootstrap/scss/list-group";
+
+// Helpers
+@import "~bootstrap/scss/helpers";
+
+// Utilities
+@import "~bootstrap/scss/utilities";
+@import "~bootstrap/scss/utilities/api";
 
 // Inline SVG icon styling
 .inline-icon {
@@ -7,5 +34,5 @@
     vertical-align: text-bottom;
     width: 1em;
     height: 1em;
-    margin-bottom : 3px;
+    margin-bottom: 3px;
 }
