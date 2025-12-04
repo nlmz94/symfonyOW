@@ -1,5 +1,6 @@
 {# templates/home/index.html.twig #}
 {% extends 'base.html.twig' %}
+{% import '_icons.html.twig' as icons %}
 
 {% block title %}OnlyWeebs — Discover 22,000+ Anime{% endblock %}
 
@@ -45,14 +46,14 @@
                     <form class="d-flex" method="get" action="{{ path('app_anime') }}">
                         <input type="text" class="form-control form-control-lg" name="searchTerm" placeholder="Search anime by title…">
                         <button class="btn btn-primary btn-lg ms-2" type="submit">
-                            <i class="bi bi-search"></i>
+                            {{ icons.icon('search') }}
                         </button>
                     </form>
 
                     <div class="d-flex flex-wrap gap-3 mt-3 text-muted small">
-                        <div><i class="bi bi-collection-play me-1"></i>22k titles</div>
-                        <div><i class="bi bi-tags me-1"></i>{{ genres|length }} genres</div>
-                        <div><i class="bi bi-building me-1"></i>{{ studios|length }} studios</div>
+                        <div>{{ icons.icon('collection-play', 'me-1') }}22k titles</div>
+                        <div>{{ icons.icon('tags', 'me-1') }}{{ genres|length }} genres</div>
+                        <div>{{ icons.icon('building', 'me-1') }}{{ studios|length }} studios</div>
                     </div>
                 </div>
                 <div class="col-lg-5 text-center">
@@ -67,7 +68,7 @@
    ------------------------------------------- #}
     <section class="mb-5">
         <div class="d-flex align-items-center justify-content-between mb-3">
-            <h2 class="h4 mb-0"><i class="bi bi-fire me-2 text-danger"></i>Trending now</h2>
+            <h2 class="h4 mb-0">{{ icons.icon('fire', 'me-2 text-danger') }}Trending now</h2>
             <a href="{{ path('app_anime') }}" class="btn btn-sm btn-outline-secondary">Browse all</a>
         </div>
 
@@ -87,7 +88,7 @@
                         </div>
                         <div class="card-footer bg-transparent border-0 pt-0 pb-3 px-3">
                             <a href="#" class="btn btn-sm btn-primary w-100">
-                                <i class="bi bi-info-circle me-1"></i> Details
+                                {{ icons.icon('info-circle', 'me-1') }} Details
                             </a>
                         </div>
                     </div>
@@ -101,7 +102,7 @@
    ------------------------------------------- #}
     <section class="mb-5">
         <div class="d-flex align-items-center justify-content-between mb-3">
-            <h2 class="h4 mb-0"><i class="bi bi-star-fill me-2 text-warning"></i>Highest rated</h2>
+            <h2 class="h4 mb-0">{{ icons.icon('star-fill', 'me-2 text-warning') }}Highest rated</h2>
             <a href="{{ path('app_anime') }}" class="btn btn-sm btn-outline-secondary">See rankings</a>
         </div>
 
@@ -121,7 +122,7 @@
                         </div>
                         <div class="card-footer bg-transparent border-0 pt-0 pb-3 px-3">
                             <a href="#" class="btn btn-sm btn-outline-primary w-100">
-                                <i class="bi bi-bookmark-plus me-1"></i> Add to list
+                                {{ icons.icon('bookmark-plus', 'me-1') }} Add to list
                             </a>
                         </div>
                     </div>
@@ -135,7 +136,7 @@
    ------------------------------------------- #}
     <section class="mb-5">
         <div class="d-flex align-items-center justify-content-between mb-3">
-            <h2 class="h4 mb-0"><i class="bi bi-clock-history me-2"></i>Recently added</h2>
+            <h2 class="h4 mb-0">{{ icons.icon('clock-history', 'me-2') }}Recently added</h2>
             <a href="{{ path('app_anime') }}" class="btn btn-sm btn-outline-secondary">View all</a>
         </div>
 
@@ -155,7 +156,7 @@
                         </div>
                         <div class="card-footer bg-transparent border-0 pt-0 pb-3 px-3">
                             <a href="#" class="btn btn-sm btn-outline-secondary w-100">
-                                <i class="bi bi-eye me-1"></i> Preview
+                                {{ icons.icon('eye', 'me-1') }} Preview
                             </a>
                         </div>
                     </div>
@@ -172,7 +173,7 @@
             <div class="col-lg-6">
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
-                        <h2 class="h5 mb-3"><i class="bi bi-tags me-2"></i>Browse by genre</h2>
+                        <h2 class="h5 mb-3">{{ icons.icon('tags', 'me-2') }}Browse by genre</h2>
                         <div class="d-flex flex-wrap gap-2">
                             {% for g in genres %}
                                 <a class="btn btn-sm btn-outline-secondary" href="{{ path('app_anime', { genre: g }) }}">{{ g }}</a>
@@ -184,7 +185,7 @@
             <div class="col-lg-6">
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
-                        <h2 class="h5 mb-3"><i class="bi bi-building me-2"></i>Browse by studio</h2>
+                        <h2 class="h5 mb-3">{{ icons.icon('building', 'me-2') }}Browse by studio</h2>
                         <div class="d-flex flex-wrap gap-2">
                             {% for s in studios %}
                                 <a class="btn btn-sm btn-outline-secondary" href="{{ path('app_anime', { studio: s }) }}">{{ s }}</a>
@@ -192,13 +193,13 @@
                         </div>
                         <hr>
                         <a class="btn btn-sm btn-outline-primary" href="{{ path('app_anime', { sort: 'year_desc' }) }}">
-                            <i class="bi bi-calendar3 me-1"></i> Newest first
+                            {{ icons.icon('calendar3', 'me-1') }} Newest first
                         </a>
                         <a class="btn btn-sm btn-outline-primary ms-2" href="{{ path('app_anime', { sort: 'rating_desc' }) }}">
-                            <i class="bi bi-star me-1"></i> Top rated
+                            {{ icons.icon('star', 'me-1') }} Top rated
                         </a>
                         <a class="btn btn-sm btn-outline-primary ms-2" href="{{ path('app_anime', { random: 1 }) }}">
-                            <i class="bi bi-shuffle me-1"></i> Random
+                            {{ icons.icon('shuffle', 'me-1') }} Random
                         </a>
                     </div>
                 </div>
@@ -215,16 +216,16 @@
                 <h2 class="h4 mb-2">Welcome back, {{ app.user.email }}!</h2>
                 <p class="text-secondary mb-3">Jump back into discovery — new titles are added every week.</p>
                 <a href="{{ path('app_anime') }}" class="btn btn-primary">
-                    <i class="bi bi-search-heart me-1"></i> Explore now
+                    {{ icons.icon('search-heart', 'me-1') }} Explore now
                 </a>
             {% else %}
                 <h2 class="h4 mb-2">Create a free account</h2>
                 <p class="text-secondary mb-3">Track favorites, rate shows, and build your watchlist.</p>
                 <a href="{{ path('app_register') }}" class="btn btn-success me-2">
-                    <i class="bi bi-person-plus-fill me-1"></i> Register
+                    {{ icons.icon('person-plus-fill', 'me-1') }} Register
                 </a>
                 <a href="{{ path('app_login') }}" class="btn btn-outline-secondary">
-                    <i class="bi bi-box-arrow-in-right me-1"></i> Login
+                    {{ icons.icon('box-arrow-in-right', 'me-1') }} Login
                 </a>
             {% endif %}
         </div>

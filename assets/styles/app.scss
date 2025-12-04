@@ -1,9 +1,11 @@
 // Import Bootstrap CSS (customizable via SCSS)
 @import "~bootstrap/scss/bootstrap";
 
-// Import Bootstrap Icons
-@import "~bootstrap-icons/font/bootstrap-icons.css";
-
-body {
-    /*background-color: lightgray;*/
+// Inline SVG icon styling
+.inline-icon {
+    display: inline-block;
+    vertical-align: text-bottom;
+    width: 1em;
+    height: 1em;
+    margin-bottom : 3px;
 }
