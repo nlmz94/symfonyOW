@@ -3,6 +3,8 @@
 
 {% block title %}{{ anime.title }}{% endblock %}
 
+{% block meta_description %}{% if anime.synopsis %}{{ anime.synopsis|slice(0, 150) }}...{% else %}Learn more about {{ anime.title }}{% if anime.titleEnglish %} ({{ anime.titleEnglish }}){% endif %} on OnlyWeebs. {% if anime.genres|length > 0 %}Genres: {{ anime.genres|slice(0,3)|map(g => g.name)|join(', ') }}.{% endif %}{% endif %}{% endblock %}
+
 {% block body %}
     <a href="{{ path('app_anime') }}" class="btn btn-link p-0 mb-3">&larr; Back to list</a>
 

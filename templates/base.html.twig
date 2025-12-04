@@ -4,6 +4,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="{% block meta_description %}OnlyWeebs - Your ultimate anime discovery platform. Explore 22,000+ anime series and movies. Browse by genre, studio, and rating.{% endblock %}">
         <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
         <title>{% block title %}OnlyWeebs{% endblock %}</title>
         {{ encore_entry_link_tags('app') }}
@@ -12,7 +13,7 @@
     <body>
         <nav class="navbar navbar-expand bg-body-tertiary border-bottom">
             <div class="container">
-                <a class="navbar-brand fw-semibold" href="{{ path('app_anime') }}">OnlyWeebs</a>
+                <a class="navbar-brand fw-semibold" href="{{ path('app_home') }}">OnlyWeebs</a>
                 <div class="navbar-nav ms-auto">
                     {% if app.user %}
                         <a class="nav-link" href="{{ path('app_profile') }}">
