@@ -15,8 +15,8 @@
                         <form method="post" action="{{ path('app_profile_upload_image') }}" enctype="multipart/form-data" id="profilePicForm">
                             <div class="position-relative d-inline-block">
                                 <picture>
-                                    <source srcset="{{ app.user.profilePic | imagine_filter('profile_webp') }}" type="image/webp">
-                                    <img src="{{ '/images/defaultProfileImage.png' | imagine_filter('profile') }}"
+                                    <source srcset="{{ app.user.profilePic ? app.user.profilePic | imagine_filter('profile_webp') : '/images/defaultProfileImage.png' | imagine_filter('profile_webp') }}" type="image/webp">
+                                    <img src="{{ app.user.profilePic ? app.user.profilePic | imagine_filter('profile') : '/images/defaultProfileImage.png' | imagine_filter('profile') }}"
                                          alt="Profile picture"
                                          class="rounded-circle shadow-sm border"
                                          id="profilePicPreview"
