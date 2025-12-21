@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\RegistrationFormType;
+use App\Validator\Constraints\StrongPassword;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -41,25 +43,14 @@ final class SecurityController extends AbstractController
     #[Route('/register', name: 'app_register')]
     public function register(Request $request): Response
     {
-        if ($request->isMethod('POST')) {
-            $csrfToken = $request->request->get('_csrf_token');
-            if (!$this->isCsrfTokenValid('register', $csrfToken)) {
-                $this->addFlash('error', 'Invalid CSRF token. Please try again.');
-                return $this->redirectToRoute('app_register');
-            }
+        $user = new User();
+        $form = $this->createForm(RegistrationFormType::class, $user);
+        $form->handleRequest($request);
 
-            $email = (string) $request->request->get('email');
-            $plainPassword = (string) $request->request->get('password');
-
-            if (empty($email) || empty($plainPassword)) {
-                $this->addFlash('error', 'Email and password are required.');
-                return $this->redirectToRoute('app_register');
-            }
-
-            $user = new User();
-            $user->setEmail($email);
-            $hashed = $this->hasher->hashPassword($user, $plainPassword);
-            $user->setPassword($hashed);
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Hash the password
+            $hashedPassword = $this->hasher->hashPassword($user, $user->getPassword());
+            $user->setPassword($hashedPassword);
 
             try {
                 $this->entityManager->persist($user);
@@ -69,10 +60,11 @@ final class SecurityController extends AbstractController
                 return $this->redirectToRoute('app_login');
             } catch (Exception) {
                 $this->addFlash('error', 'Registration failed. Email may already be in use.');
-                return $this->redirectToRoute('app_register');
             }
         }
 
-        return $this->render('security/register.html.twig');
+        return $this->render('security/register.html.twig', [
+            'registrationForm' => $form->createView(),
+        ]);
     }
 }

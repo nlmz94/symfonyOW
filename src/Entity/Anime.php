@@ -18,6 +18,7 @@ class Anime
     private int $id;
 
     #[ORM\Column(name: 'title', length: 1024)]
+    #[ORM\Index(name: 'idx_anime_title')]
     private string $title;
 
     #[ORM\Column(name: 'title_english', length: 1024, nullable: true)]
@@ -33,6 +34,7 @@ class Anime
     private ?string $oldImgUrl = null;      // ORIGINAL remote URL
 
     #[ORM\Column(name: 'episodes', type: 'integer', nullable: true)]
+    #[ORM\Index(name: 'idx_anime_episodes')]
     private ?int $episodes = null;
 
     #[ORM\ManyToOne(targetEntity: Pegi::class, inversedBy: 'animes')]
@@ -43,6 +45,7 @@ class Anime
     private ?string $airing = null;
 
     #[ORM\Column(name: 'aired', type: 'boolean', nullable: true)]
+    #[ORM\Index(name: 'idx_anime_aired')]
     private ?bool $aired = null;
 
     #[ORM\ManyToMany(targetEntity: Genre::class, inversedBy: 'animes')]

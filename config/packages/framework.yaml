@@ -5,6 +5,11 @@ framework:
     # Note that the session will be started ONLY if you read or write from it.
     session: true
 
+    # Security headers configuration
+    http_method_override: false
+    trusted_headers: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port']
+    trusted_proxies: '%env(TRUSTED_PROXIES)%'
+
     #esi: true
     #fragments: true
 
