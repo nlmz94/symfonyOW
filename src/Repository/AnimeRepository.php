@@ -29,9 +29,7 @@ class AnimeRepository extends ServiceEntityRepository
             ->setMaxResults($limit);
 
         if ($searchTerm !== null && $searchTerm !== '') {
-            error_log(var_export('%'.$searchTerm.'%', true));
-            $qb->andWhere('LOWER(a.title) LIKE LOWER(:searchTerm)')
-                ->andWhere('LOWER(a.titleEnglish) LIKE LOWER(:searchTerm)')
+            $qb->andWhere('LOWER(a.title) LIKE LOWER(:searchTerm) OR LOWER(a.titleEnglish) LIKE LOWER(:searchTerm)')
                 ->setParameter('searchTerm', '%'.$searchTerm.'%');
         }
 

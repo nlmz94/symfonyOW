@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}401 - Unauthorized{% endblock %}
+
+{% block meta_description %}You are not authorized to access this page. Please log in or check your permissions.{% endblock %}
+
+{% block body %}
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <h1 class="display-1 fw-bold text-danger mb-4">401</h1>
+                <h2 class="h3 mb-3">Unauthorized Access</h2>
+                <p class="lead text-muted mb-4">
+                    You need to be authenticated to access this page.
+                </p>
+                
+                {% if app.user %}
+                    <p class="mb-4">You are logged in but don't have sufficient permissions.</p>
+                {% else %}
+                    <p class="mb-4">Please log in to access this content.</p>
+                    <a href="{{ path('app_login') }}" class="btn btn-primary me-2">
+                        Login
+                    </a>
+                {% endif %}
+                
+                <a href="{{ path('app_home') }}" class="btn btn-outline-secondary">
+                    Return to Homepage
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

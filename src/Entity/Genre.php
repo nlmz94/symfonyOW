@@ -17,7 +17,6 @@ class Genre
     private ?int $id = null;
 
     #[ORM\Column(name: 'name', length: 512, nullable: true)]
-    #[ORM\Index(name: 'idx_genre_name')]
     private ?string $name = null;
 
     /** @var Collection<int, Anime> */

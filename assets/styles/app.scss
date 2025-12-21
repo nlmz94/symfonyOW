@@ -36,3 +36,46 @@
     height: 1em;
     margin-bottom: 3px;
 }
+
+// Accessibility: Skip link
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.sr-only-focusable:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0.5rem;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+    background-color: #007bff;
+    color: white;
+    z-index: 1000;
+}
+
+// Focus styles for better accessibility
+:focus-visible {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+// Reduced motion for users who prefer it
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

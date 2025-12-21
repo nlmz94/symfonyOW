@@ -21,6 +21,7 @@
 ###< symfony/asset-mapper ###
 /public/images/animes/
 /public/images/.DS_Store
+/public/users/profilePics/
 
 ###> symfony/webpack-encore-bundle ###
 /node_modules/

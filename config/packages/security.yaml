@@ -36,6 +36,7 @@ security:
                 path: /
 
     access_control:
+        - { path: ^/test, roles: PUBLIC_ACCESS }
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
         - { path: ^/logout, roles: PUBLIC_ACCESS }

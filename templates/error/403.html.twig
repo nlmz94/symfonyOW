@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}403 - Forbidden{% endblock %}
+
+{% block meta_description %}Access to this page is forbidden. You don't have permission to view this content.{% endblock %}
+
+{% block body %}
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <h1 class="display-1 fw-bold text-danger mb-4">403</h1>
+                <h2 class="h3 mb-3">Access Forbidden</h2>
+                <p class="lead text-muted mb-4">
+                    You don't have permission to access this resource.
+                </p>
+                
+                <div class="alert alert-warning mb-4">
+                    This content is restricted and requires special permissions.
+                </div>
+                
+                {% if app.user %}
+                    <p class="mb-4">
+                        You are logged in as <strong>{{ app.user.email }}</strong> but don't have sufficient privileges.
+                    </p>
+                {% else %}
+                    <p class="mb-4">Please log in with an account that has proper permissions.</p>
+                {% endif %}
+                
+                <a href="{{ path('app_home') }}" class="btn btn-outline-secondary">
+                    Return to Homepage
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

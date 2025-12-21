@@ -1,6 +1,6 @@
 {% import '_icons.html.twig' as icons %}
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light">
+<html lang="en" data-bs-theme="light" class="h-100">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,6 +9,8 @@
         <title>{% block title %}OnlyWeebs{% endblock %}</title>
         {{ encore_entry_link_tags('app') }}
         {% block stylesheets %}{% endblock %}
+        <meta name="theme-color" content="#ffffff">
+        <link rel="canonical" href="{{ app.request.uri }}">
     </head>
     <body>
         <nav class="navbar navbar-expand bg-body-tertiary border-bottom">
@@ -16,36 +18,36 @@
                 <a class="navbar-brand fw-semibold" href="{{ path('app_home') }}">OnlyWeebs</a>
                 <div class="navbar-nav ms-auto">
                     {% if app.user %}
-                        <a class="nav-link" href="{{ path('app_profile') }}">
-                            {{ icons.icon('people', 'me-1') }} Profile
+                        <a class="nav-link" href="{{ path('app_profile') }}" aria-current="{{ app.request.get('_route') == 'app_profile' ? 'page' : 'false' }}">
+                            {{ icons.icon('people', 'me-1') }} <span>Profile</span>
                         </a>
                         <a class="nav-link" href="{{ path('app_logout') }}">
-                            {{ icons.icon('box-arrow-right', 'me-1') }} Logout
+                            {{ icons.icon('box-arrow-right', 'me-1') }} <span>Logout</span>
                         </a>
                     {% else %}
-                        <a class="nav-link" href="{{ path('app_login') }}">
-                            {{ icons.icon('box-arrow-in-right', 'me-1') }} Login
+                        <a class="nav-link" href="{{ path('app_login') }}" aria-current="{{ app.request.get('_route') == 'app_login' ? 'page' : 'false' }}">
+                            {{ icons.icon('box-arrow-in-right', 'me-1') }} <span>Login</span>
                         </a>
-                        <a class="nav-link" href="{{ path('app_register') }}">
-                            {{ icons.icon('person-plus', 'me-1') }} Register
+                        <a class="nav-link" href="{{ path('app_register') }}" aria-current="{{ app.request.get('_route') == 'app_register' ? 'page' : 'false' }}">
+                            {{ icons.icon('person-plus', 'me-1') }} <span>Register</span>
                         </a>
                     {% endif %}
 
-                    <button id="theme-toggle" class="btn btn-outline-secondary ms-3" type="button">
-                        <span id="theme-icon">{{ icons.icon('moon-fill') }}</span>
+                    <button id="theme-toggle" class="btn btn-outline-secondary ms-3" type="button" aria-label="Toggle dark/light theme" aria-pressed="false">
+                        <span id="theme-icon" aria-hidden="true">{{ icons.icon('moon-fill') }}</span>
                     </button>
                 </div>
             </div>
         </nav>
-        <main class="container my-4">
+        <main id="main-content" class="container my-4" role="main" tabindex="-1">
             {% for label, messages in app.flashes %}
                 {% for message in messages %}
-                    <div class="alert alert-{{ label == 'error' ? 'danger' : label }} mb-3">{{ message }}</div>
+                    <div class="alert alert-{{ label == 'error' ? 'danger' : label }} mb-3" role="alert">{{ message }}</div>
                 {% endfor %}
             {% endfor %}
             {% block body %}{% endblock %}
         </main>
-        <footer class="border-top py-4">
+        <footer class="border-top py-4 mt-auto" role="contentinfo">
             <div class="container text-muted small">&copy; {{ "now"|date("Y") }} OnlyWeebs</div>
         </footer>
         {{ encore_entry_script_tags('app') }}

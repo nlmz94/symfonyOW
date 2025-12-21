@@ -9,6 +9,7 @@ framework:
     http_method_override: false
     trusted_headers: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port']
     trusted_proxies: '%env(TRUSTED_PROXIES)%'
+    error_controller: App\Controller\ExceptionController::show
 
     #esi: true
     #fragments: true
