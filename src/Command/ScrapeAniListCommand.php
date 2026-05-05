@@ -375,7 +375,8 @@ class ScrapeAniListCommand extends Command
         $anime->setUpdatedAt(new DateTimeImmutable());
 
         if (!empty($m['trailer']) && ($m['trailer']['site'] ?? null) === 'youtube') {
-            $anime->setTrailerYoutubeId($m['trailer']['id'] ?? null);
+            $tid = $m['trailer']['id'] ?? null;
+            $anime->setTrailerYoutubeId($tid !== null ? mb_substr((string) $tid, 0, 64) : null);
         }
 
         $this->syncGenres($anime, $m['genres'] ?? []);

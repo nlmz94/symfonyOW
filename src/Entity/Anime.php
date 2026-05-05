@@ -98,7 +98,7 @@ class Anime
     #[ORM\Column(name: 'favourites', type: 'integer', nullable: true)]
     private ?int $favourites = null;
 
-    #[ORM\Column(name: 'trailer_youtube_id', length: 32, nullable: true)]
+    #[ORM\Column(name: 'trailer_youtube_id', length: 64, nullable: true)]
     private ?string $trailerYoutubeId = null;
 
     #[ORM\Column(name: 'updated_at', type: 'datetime_immutable', nullable: true)]
