@@ -34,9 +34,7 @@ framework:
 when@prod:
     framework:
         cache:
-            # Use Redis in production for better performance
-            app: cache.adapter.redis
-            default_redis_provider: 'redis://localhost'
+            app: cache.adapter.filesystem
 
             pools:
                 doctrine.result_cache_pool:
