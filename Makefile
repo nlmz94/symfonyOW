@@ -3,7 +3,7 @@ WEB_USER       ?= www-data
 CONSOLE         = php bin/console
 ENV             = prod
 
-.PHONY: deploy pull install build migrate cache permissions reload-fpm logs stan
+.PHONY: deploy pull install build migrate cache permissions reload-fpm logs stan wipe-anime scrape-anime reset-anime
 
 deploy: pull install build migrate cache permissions reload-fpm
 	@echo ""
@@ -43,3 +43,12 @@ logs:
 
 stan:
 	vendor/bin/phpstan analyse --memory-limit=1G
+
+wipe-anime:
+	$(CONSOLE) app:anime:wipe --force
+
+scrape-anime:
+	$(CONSOLE) app:anime:scrape --all-strategies
+	$(CONSOLE) app:liip:warmup
+
+reset-anime: wipe-anime scrape-anime
