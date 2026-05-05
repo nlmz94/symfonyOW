@@ -470,11 +470,17 @@ class ScrapeAniListCommand extends Command
     /** @param array<int, array<string, mixed>> $edges */
     private function syncCharacters(Anime $anime, array $edges): void
     {
-        // Wipe existing AnimeCharacter joins for this anime and rebuild — simpler than diffing
+        // Wipe existing AnimeCharacter joins for this anime and rebuild — simpler than diffing.
+        // Doctrine flushes INSERTs before DELETEs, so we must flush deletes first when re-adding
+        // joins with the same unique key (anime_id, character_id).
+        $hadExistingJoins = !$anime->getCharacters()->isEmpty();
         foreach ($anime->getCharacters() as $ac) {
             $this->em->remove($ac);
         }
         $anime->getCharacters()->clear();
+        if ($hadExistingJoins) {
+            $this->em->flush();
+        }
 
         $seenCharacterIds = [];
         foreach ($edges as $edge) {
@@ -512,10 +518,15 @@ class ScrapeAniListCommand extends Command
     /** @param array<int, array<string, mixed>> $edges */
     private function syncStaff(Anime $anime, array $edges): void
     {
+        // Same flush-before-rebuild concern as syncCharacters
+        $hadExistingJoins = !$anime->getStaff()->isEmpty();
         foreach ($anime->getStaff() as $as) {
             $this->em->remove($as);
         }
         $anime->getStaff()->clear();
+        if ($hadExistingJoins) {
+            $this->em->flush();
+        }
 
         // Dedupe by (anilist staff id, role) — AniList sometimes lists the same person
         // twice with the same role and our unique constraint would reject the second insert.
