@@ -6,15 +6,19 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
+use Twig\Environment;
 
 class ExceptionController extends AbstractController
 {
+    public function __construct(private Environment $twig)
+    {
+    }
+
     public function show(FlattenException $exception, DebugLoggerInterface $logger = null): Response
     {
         $statusCode = $exception->getStatusCode();
         $template = sprintf('error/%d.html.twig', $statusCode);
 
-        // In debug mode, show the full exception
         if ($this->getParameter('kernel.debug') && $logger) {
             return new Response($this->renderView('@Twig/Exception/exception.html.twig', [
                 'exception' => $exception,
@@ -22,8 +26,7 @@ class ExceptionController extends AbstractController
             ]));
         }
 
-        // Use our custom error template
-        if ($this->get('twig')->getLoader()->exists($template)) {
+        if ($this->twig->getLoader()->exists($template)) {
             return $this->render($template, [
                 'status_code' => $statusCode,
                 'status_text' => Response::$statusTexts[$statusCode] ?? 'Error',
