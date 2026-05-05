@@ -17,8 +17,10 @@ use App\Repository\ProducerRepository;
 use App\Repository\StaffRepository;
 use App\Repository\StudioRepository;
 use App\Service\AniListClient;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Random\RandomException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -28,6 +30,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Throwable;
 
 #[AsCommand(name: 'app:anime:scrape', description: 'Scrape anime data from AniList and upsert into the DB')]
 class ScrapeAniListCommand extends Command
@@ -105,6 +108,9 @@ class ScrapeAniListCommand extends Command
             ->addOption('skip-images', null, InputOption::VALUE_NONE, 'Do not download cover/banner files');
     }
 
+    /**
+     * @throws RandomException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
@@ -116,15 +122,13 @@ class ScrapeAniListCommand extends Command
         $sort           = (string) $input->getOption('sort');
         $year           = $input->getOption('year') !== null ? (int) $input->getOption('year') : null;
         $yearFrom       = (int) $input->getOption('year-from');
-        $yearTo         = $input->getOption('year-to') !== null
-            ? (int) $input->getOption('year-to')
-            : (int) date('Y');
+        $yearTo         = $input->getOption('year-to') !== null ? (int) $input->getOption('year-to') : (int) date('Y');
         $updateExisting = (bool) $input->getOption('update-existing');
         $skipImages     = (bool) $input->getOption('skip-images');
         $coverDir = $this->projectDir . self::COVER_DIR;
 
         if (!$skipImages && !is_dir($coverDir) && !mkdir($coverDir, 0775, true) && !is_dir($coverDir)) {
-            $io->error("Cannot create cover dir: {$coverDir}");
+            $io->error("Cannot create cover dir: $coverDir");
             return Command::FAILURE;
         }
 
@@ -180,6 +184,7 @@ class ScrapeAniListCommand extends Command
     /**
      * Runs a single (sort, year) strategy, paginating until exhaustion or fixed page count.
      * Updates $this->stats in place.
+     * @throws RandomException
      */
     private function runStrategy(
         SymfonyStyle    $io,
@@ -200,18 +205,20 @@ class ScrapeAniListCommand extends Command
 
             try {
                 $result = $this->anilist->fetchPage($page, $perPage, $sort, $year);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $msg = $e->getMessage();
+
                 // AniList caps page numbers (~100 with perPage=50). Treat that as end-of-results.
+                $progress?->clear();
+
                 if (str_contains($msg, 'Page exceeds maximum')) {
-                    if ($progress) { $progress->clear(); }
-                    $io->writeln("Page {$page} beyond AniList's public cap; ending this strategy.");
-                    if ($progress) { $progress->display(); }
+                    $io->writeln("Page $page beyond AniList's public cap; ending this strategy.");
+                    $progress?->display();
                     break;
                 }
-                if ($progress) { $progress->clear(); }
-                $io->error("Page {$page} failed: " . $msg);
-                if ($progress) { $progress->display(); }
+
+                $io->error("Page $page failed: " . $msg);
+                $progress?->display();
                 $this->stats['errors']++;
                 sleep(60);
                 continue;
@@ -250,34 +257,35 @@ class ScrapeAniListCommand extends Command
                     ?? $media['title']['romaji']
                     ?? $media['title']['native']
                     ?? '?';
-                $progress->setMessage($this->truncate($titleForBar, 70), 'title');
+                $progress->setMessage($this->truncate($titleForBar), 'title');
                 $progress->display();
 
                 try {
                     $this->ensureEmOpen();
                     $action = $this->upsertAnime($media, $updateExisting, $skipImages);
                     $this->stats[$action]++;
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     $this->stats['errors']++;
                     $progress->clear();
                     $io->warning(sprintf('media id=%s failed: %s', $media['id'] ?? '?', $e->getMessage()));
                     $progress->display();
                     $this->ensureEmOpen();
                 }
+
                 $this->updateStatsMessages($progress, $this->stats, $page, (int) $pageInfo['lastPage'], $remaining);
                 $progress->advance();
             }
 
             try {
                 $this->em->flush();
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $progress->clear();
                 $io->warning('Page flush failed: ' . $e->getMessage());
                 $progress->display();
             }
+
             $this->em->clear();
             $this->clearIdentityMaps();
-
             $this->politeDelay($remaining, $progress);
 
             if (!$hasNext) {
@@ -285,15 +293,14 @@ class ScrapeAniListCommand extends Command
             }
         }
 
-        if ($progress) {
-            $progress->finish();
-        }
+        $progress?->finish();
         $io->newLine(2);
     }
 
     /**
      * AniList ToS allows ~90 req/min; we target ~50 req/min sustained.
      * Sleeps ~1.2s + random 0–400ms jitter between API requests, longer if rate budget is low.
+     * @throws RandomException
      */
     private function politeDelay(?int $remaining, ?ProgressBar $progress): void
     {
@@ -321,9 +328,9 @@ class ScrapeAniListCommand extends Command
         $bar->setMessage($lastPage > 0 ? (string) $lastPage : '?', 'lastpage');
     }
 
-    private function truncate(string $s, int $max): string
+    private function truncate(string $s): string
     {
-        return mb_strlen($s) <= $max ? $s : mb_substr($s, 0, $max - 1) . '…';
+        return mb_strlen($s) <= 70 ? $s : mb_substr($s, 0, 70 - 1) . '…';
     }
 
     /** @param array<string, mixed> $m  @return 'inserted'|'updated'|'skipped' */
@@ -365,7 +372,7 @@ class ScrapeAniListCommand extends Command
         $anime->setCoverColor($m['coverImage']['color'] ?? null);
         $anime->setOldImgUrl($m['coverImage']['large'] ?? $m['coverImage']['extraLarge'] ?? null);
         $anime->setOldBannerUrl($m['bannerImage'] ?? null);
-        $anime->setUpdatedAt(new \DateTimeImmutable());
+        $anime->setUpdatedAt(new DateTimeImmutable());
 
         if (!empty($m['trailer']) && ($m['trailer']['site'] ?? null) === 'youtube') {
             $anime->setTrailerYoutubeId($m['trailer']['id'] ?? null);
@@ -408,7 +415,7 @@ class ScrapeAniListCommand extends Command
         }
         $genre = $this->genreRepo->findOneBy(['name' => $name]);
         if (!$genre) {
-            $genre = (new Genre())->setName($name);
+            $genre = new Genre()->setName($name);
             $this->em->persist($genre);
         }
         $this->genreByName[$name] = $genre;
@@ -422,7 +429,7 @@ class ScrapeAniListCommand extends Command
         }
         $studio = $this->studioRepo->findOneBy(['name' => $name]);
         if (!$studio) {
-            $studio = (new Studio())->setName($name);
+            $studio = new Studio()->setName($name);
             $this->em->persist($studio);
         }
         $this->studioByName[$name] = $studio;
@@ -436,7 +443,7 @@ class ScrapeAniListCommand extends Command
         }
         $producer = $this->producerRepo->findOneBy(['name' => $name]);
         if (!$producer) {
-            $producer = (new Producer())->setName($name);
+            $producer = new Producer()->setName($name);
             $this->em->persist($producer);
         }
         $this->producerByName[$name] = $producer;
@@ -505,7 +512,7 @@ class ScrapeAniListCommand extends Command
                 ]);
             }
 
-            $ac = (new AnimeCharacter())
+            $ac = new AnimeCharacter()
                 ->setAnime($anime)
                 ->setCharacter($character)
                 ->setVoiceActor($voiceActor)
@@ -552,7 +559,7 @@ class ScrapeAniListCommand extends Command
             ]);
             if (!$staff) { continue; }
 
-            $as = (new AnimeStaff())
+            $as = new AnimeStaff()
                 ->setAnime($anime)
                 ->setStaff($staff)
                 ->setRole($role);
@@ -561,7 +568,7 @@ class ScrapeAniListCommand extends Command
         }
     }
 
-    /** @param array{id: ?int, name: ?array{full?: string}, image: ?array{large?: string}, languageV2: ?string} $data */
+    /** @param array<string, mixed> $data */
     private function upsertStaff(array $data): ?Staff
     {
         $aid = (int) ($data['id'] ?? 0);
@@ -574,7 +581,7 @@ class ScrapeAniListCommand extends Command
         $staff = $this->staffRepo->findOneByAnilistId($aid);
         if (!$staff) {
             $language = $data['languageV2'] ?? null;
-            $staff = (new Staff())
+            $staff = new Staff()
                 ->setAnilistId($aid)
                 ->setName(mb_substr((string) ($data['name']['full'] ?? 'Unknown'), 0, 256))
                 ->setOldImageUrl($data['image']['large'] ?? null)
@@ -595,7 +602,7 @@ class ScrapeAniListCommand extends Command
         $character = $this->characterRepo->findOneByAnilistId($aid);
         if (!$character) {
             $gender = $node['gender'] ?? null;
-            $character = (new Character())
+            $character = new Character()
                 ->setAnilistId($aid)
                 ->setName(mb_substr((string) ($node['name']['full'] ?? 'Unknown'), 0, 256))
                 ->setOldImageUrl($node['image']['large'] ?? null)
@@ -633,20 +640,20 @@ class ScrapeAniListCommand extends Command
             if ($response->getStatusCode() !== 200) { return false; }
             file_put_contents($destination, $response->getContent(false));
             return true;
-        } catch (\Throwable) {
+        } catch (Throwable) {
             return false;
         }
     }
 
     /** @param array{year: ?int, month: ?int, day: ?int}|null $d */
-    private function parseFuzzyDate(?array $d): ?\DateTimeImmutable
+    private function parseFuzzyDate(?array $d): ?DateTimeImmutable
     {
         if (!$d || empty($d['year'])) { return null; }
         $month = (int) ($d['month'] ?? 1);
         $day   = (int) ($d['day']   ?? 1);
         try {
-            return new \DateTimeImmutable(sprintf('%04d-%02d-%02d', $d['year'], $month, $day));
-        } catch (\Throwable) {
+            return new DateTimeImmutable(sprintf('%04d-%02d-%02d', $d['year'], $month, $day));
+        } catch (Throwable) {
             return null;
         }
     }
