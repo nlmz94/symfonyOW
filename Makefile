@@ -48,7 +48,7 @@ wipe-anime:
 	$(CONSOLE) app:anime:wipe --force
 
 scrape-anime:
-	$(CONSOLE) app:anime:scrape --all-strategies
-	$(CONSOLE) app:liip:warmup
+	$(CONSOLE) app:anime:scrape --all-strategies --no-debug
+	$(CONSOLE) app:liip:warmup --no-debug
 
 reset-anime: wipe-anime scrape-anime
