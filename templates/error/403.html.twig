@@ -13,22 +13,9 @@
                 <p class="lead text-muted mb-4">
                     You don't have permission to access this resource.
                 </p>
-                
                 <div class="alert alert-warning mb-4">
                     This content is restricted and requires special permissions.
                 </div>
-                
-                {% if app.user %}
-                    <p class="mb-4">
-                        You are logged in as <strong>{{ app.user.email }}</strong> but don't have sufficient privileges.
-                    </p>
-                {% else %}
-                    <p class="mb-4">Please log in with an account that has proper permissions.</p>
-                {% endif %}
-                
-                <a href="{{ path('app_home') }}" class="btn btn-outline-secondary">
-                    Return to Homepage
-                </a>
             </div>
         </div>
     </div>

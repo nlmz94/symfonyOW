@@ -13,19 +13,6 @@
                 <p class="lead text-muted mb-4">
                     You need to be authenticated to access this page.
                 </p>
-                
-                {% if app.user %}
-                    <p class="mb-4">You are logged in but don't have sufficient permissions.</p>
-                {% else %}
-                    <p class="mb-4">Please log in to access this content.</p>
-                    <a href="{{ path('app_login') }}" class="btn btn-primary me-2">
-                        Login
-                    </a>
-                {% endif %}
-                
-                <a href="{{ path('app_home') }}" class="btn btn-outline-secondary">
-                    Return to Homepage
-                </a>
             </div>
         </div>
     </div>
