@@ -24,6 +24,11 @@ final class AnimeController extends AbstractController
     #[Route('/anime/{id<\d+>}', name: 'anime_show', methods: ['GET'])]
     public function show(Anime $anime): Response
     {
-        return $this->render('anime/show.html.twig', ['anime' => $anime]);
+        $response = $this->render('anime/show.html.twig', ['anime' => $anime]);
+        $response->setPublic();
+        $response->setMaxAge(3600);
+        $response->setSharedMaxAge(86400);
+
+        return $response;
     }
 }

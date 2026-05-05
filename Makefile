@@ -3,7 +3,7 @@ WEB_USER       ?= www-data
 CONSOLE         = php bin/console
 ENV             = prod
 
-.PHONY: deploy pull install build migrate cache permissions reload-fpm logs
+.PHONY: deploy pull install build migrate cache permissions reload-fpm logs stan
 
 deploy: pull install build migrate cache permissions reload-fpm
 	@echo ""
@@ -40,3 +40,6 @@ reload-fpm:
 
 logs:
 	tail -n 100 -f var/log/$(ENV)-$$(date +%Y-%m-%d).log
+
+stan:
+	vendor/bin/phpstan analyse --memory-limit=1G
