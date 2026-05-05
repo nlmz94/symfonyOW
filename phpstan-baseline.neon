@@ -25,12 +25,6 @@ parameters:
 			path: src/Command/LiipWarmupWorkerCommand.php
 
 		-
-			message: '#^Deprecated in PHP 8\.4\: Parameter \#2 \$logger \(Symfony\\Component\\HttpKernel\\Log\\DebugLoggerInterface\) is implicitly nullable via default value null\.$#'
-			identifier: parameter.implicitlyNullable
-			count: 1
-			path: src/Controller/ExceptionController.php
-
-		-
 			message: '#^Property App\\Entity\\Anime\:\:\$genres type mapping mismatch\: property can contain Doctrine\\Common\\Collections\\Collection but database expects Doctrine\\Common\\Collections\\Collection&iterable\<App\\Entity\\Genre\>\.$#'
 			identifier: doctrine.associationType
 			count: 1

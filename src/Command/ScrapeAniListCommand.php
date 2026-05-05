@@ -201,8 +201,16 @@ class ScrapeAniListCommand extends Command
             try {
                 $result = $this->anilist->fetchPage($page, $perPage, $sort, $year);
             } catch (\Throwable $e) {
+                $msg = $e->getMessage();
+                // AniList caps page numbers (~100 with perPage=50). Treat that as end-of-results.
+                if (str_contains($msg, 'Page exceeds maximum')) {
+                    if ($progress) { $progress->clear(); }
+                    $io->writeln("Page {$page} beyond AniList's public cap; ending this strategy.");
+                    if ($progress) { $progress->display(); }
+                    break;
+                }
                 if ($progress) { $progress->clear(); }
-                $io->error("Page {$page} failed: " . $e->getMessage());
+                $io->error("Page {$page} failed: " . $msg);
                 if ($progress) { $progress->display(); }
                 $this->stats['errors']++;
                 sleep(60);
@@ -468,11 +476,14 @@ class ScrapeAniListCommand extends Command
         }
         $anime->getCharacters()->clear();
 
+        $seenCharacterIds = [];
         foreach ($edges as $edge) {
             $node = $edge['node'] ?? null;
             if (!$node) { continue; }
             $aid = (int) ($node['id'] ?? 0);
             if ($aid === 0) { continue; }
+            if (isset($seenCharacterIds[$aid])) { continue; }
+            $seenCharacterIds[$aid] = true;
 
             $character = $this->getOrCreateCharacter($aid, $node);
 
@@ -506,14 +517,24 @@ class ScrapeAniListCommand extends Command
         }
         $anime->getStaff()->clear();
 
+        // Dedupe by (anilist staff id, role) — AniList sometimes lists the same person
+        // twice with the same role and our unique constraint would reject the second insert.
+        $seen = [];
         foreach ($edges as $edge) {
             $node = $edge['node'] ?? null;
             if (!$node) { continue; }
-            $role = (string) ($edge['role'] ?? '');
+            $role = substr((string) ($edge['role'] ?? ''), 0, 128);
             if ($role === '') { continue; }
 
+            $anilistStaffId = (int) ($node['id'] ?? 0);
+            if ($anilistStaffId === 0) { continue; }
+
+            $key = $anilistStaffId . '|' . $role;
+            if (isset($seen[$key])) { continue; }
+            $seen[$key] = true;
+
             $staff = $this->upsertStaff([
-                'id'         => $node['id'] ?? null,
+                'id'         => $anilistStaffId,
                 'name'       => $node['name'] ?? null,
                 'image'      => $node['image'] ?? null,
                 'languageV2' => $node['languageV2'] ?? null,
@@ -523,7 +544,7 @@ class ScrapeAniListCommand extends Command
             $as = (new AnimeStaff())
                 ->setAnime($anime)
                 ->setStaff($staff)
-                ->setRole(substr($role, 0, 128));
+                ->setRole($role);
             $this->em->persist($as);
             $anime->getStaff()->add($as);
         }

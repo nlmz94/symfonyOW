@@ -5,7 +5,6 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Twig\Environment;
 
 class ExceptionController extends AbstractController
@@ -14,30 +13,28 @@ class ExceptionController extends AbstractController
     {
     }
 
-    public function show(FlattenException $exception, DebugLoggerInterface $logger = null): Response
+    public function show(FlattenException $exception): Response
     {
         $statusCode = $exception->getStatusCode();
+        $statusText = Response::$statusTexts[$statusCode] ?? 'Error';
         $template = sprintf('error/%d.html.twig', $statusCode);
-
-        if ($this->getParameter('kernel.debug') && $logger) {
-            return new Response($this->renderView('@Twig/Exception/exception.html.twig', [
-                'exception' => $exception,
-                'logger' => $logger,
-            ]));
-        }
 
         if ($this->twig->getLoader()->exists($template)) {
             return $this->render($template, [
                 'status_code' => $statusCode,
-                'status_text' => Response::$statusTexts[$statusCode] ?? 'Error',
-                'exception' => $exception,
-            ]);
+                'status_text' => $statusText,
+                'exception'   => $exception,
+            ], new Response('', $statusCode));
         }
 
-        // Fallback to default Symfony error page
-        return new Response($this->renderView('@Twig/Exception/error.html.twig', [
-            'status_code' => $statusCode,
-            'status_text' => Response::$statusTexts[$statusCode] ?? 'Error',
-        ]));
+        // No custom template for this code — return a minimal HTML page
+        $body = sprintf(
+            '<!DOCTYPE html><html><head><title>%1$d %2$s</title></head>'
+            . '<body><h1>%1$d %2$s</h1></body></html>',
+            $statusCode,
+            htmlspecialchars($statusText, ENT_QUOTES, 'UTF-8'),
+        );
+
+        return new Response($body, $statusCode);
     }
 }
