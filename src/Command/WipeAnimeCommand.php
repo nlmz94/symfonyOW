@@ -89,9 +89,19 @@ class WipeAnimeCommand extends Command
             } else {
                 $io->writeln("  {$dir} does not exist; skipping");
             }
+
+            $io->section('Clearing Liip image cache');
+            $cacheDir = $this->projectDir . '/public/media/cache';
+            if (is_dir($cacheDir)) {
+                $fs = new Filesystem();
+                $fs->remove($cacheDir);
+                $io->writeln("  removed {$cacheDir}");
+            } else {
+                $io->writeln("  {$cacheDir} does not exist; skipping");
+            }
         }
 
-        $io->success('Wipe complete. Run `php bin/console app:anime:scrape --all` to repopulate.');
+        $io->success('Wipe complete. Run `php bin/console app:anime:scrape --all-strategies` to repopulate.');
         return Command::SUCCESS;
     }
 }

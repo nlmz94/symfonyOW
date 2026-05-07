@@ -3,7 +3,7 @@ WEB_USER       ?= www-data
 CONSOLE         = php bin/console
 ENV             = prod
 
-.PHONY: deploy pull install build migrate cache permissions reload-fpm logs stan wipe-anime scrape-anime reset-anime
+.PHONY: deploy pull install build migrate cache permissions reload-fpm logs stan wipe-anime scrape-anime reset-anime reset-images-cache install-cron uninstall-cron
 
 deploy: pull install build migrate cache permissions reload-fpm
 	@echo ""
@@ -52,3 +52,24 @@ scrape-anime:
 	$(CONSOLE) app:liip:warmup --no-debug
 
 reset-anime: wipe-anime scrape-anime
+
+reset-images-cache:
+	$(CONSOLE) liip:imagine:cache:remove --no-debug
+	$(CONSOLE) app:liip:warmup --no-debug
+
+# Adds (or refreshes) the weekly scrape cron line for the current user.
+# Idempotent: any existing line referencing scrape-weekly.sh is replaced.
+CRON_SCHEDULE = 0 2 * * 0
+CRON_SCRIPT   = $(shell pwd)/bin/scrape-weekly.sh
+CRON_LOG      = $(shell pwd)/var/log/scrape-cron.log
+
+install-cron:
+	chmod +x bin/scrape-weekly.sh
+	@( crontab -l 2>/dev/null | grep -v "scrape-weekly.sh" ; \
+	   echo "$(CRON_SCHEDULE) $(CRON_SCRIPT) >> $(CRON_LOG) 2>&1" ) | crontab -
+	@echo "Installed:"
+	@crontab -l | grep "scrape-weekly.sh"
+
+uninstall-cron:
+	@crontab -l 2>/dev/null | grep -v "scrape-weekly.sh" | crontab - || true
+	@echo "Removed scrape-weekly.sh entries from crontab."
