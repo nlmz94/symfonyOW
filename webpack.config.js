@@ -1,4 +1,5 @@
-const Encore = require('@symfony/webpack-encore');
+// Encore 7 is ESM with a default export; require() yields the module namespace.
+const Encore = require('@symfony/webpack-encore').default;
 
 if (!Encore.isRuntimeEnvironmentConfigured()) {
     Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
@@ -57,10 +58,13 @@ Encore
     //     config.plugins.push('@babel/a-babel-plugin');
     // })
 
-    // enables and configure @babel/preset-env polyfills
-    .configureBabelPresetEnv((config) => {
-        config.useBuiltIns = 'usage';
-        config.corejs = '3.38';
+    // Babel 8 removed useBuiltIns/corejs from @babel/preset-env; core-js
+    // polyfills are injected by babel-plugin-polyfill-corejs3 instead.
+    .configureBabel((babelConfig) => {
+        babelConfig.plugins.push([
+            'polyfill-corejs3',
+            { method: 'usage-global', version: '3.50' },
+        ]);
     })
 
     // uncomment to get integrity="..." attributes on your script & link tags
