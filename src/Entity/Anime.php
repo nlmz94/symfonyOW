@@ -9,6 +9,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AnimeRepository::class)]
 #[ORM\Table(name: 'anime')]
+#[ORM\Index(name: 'idx_anime_mal_id', columns: ['mal_id'])]
+#[ORM\Index(name: 'idx_anime_popularity', columns: ['popularity'])]
+#[ORM\Index(name: 'idx_anime_average_score', columns: ['average_score'])]
 #[ORM\Cache("NONSTRICT_READ_WRITE")]
 class Anime
 {
