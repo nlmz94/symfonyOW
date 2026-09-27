@@ -1,0 +1,9 @@
+.git
+.idea
+var/
+vendor/
+public/media/cache/
+public/users/profilePics/
+public/images/animes/
+.phpunit.cache/
+*.log

@@ -2,70 +2,77 @@
 
 namespace App\Controller;
 
+use App\Api\UserPresenter;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * The authenticated user's own account. access_control requires ROLE_USER on
+ * ^/api/me, so anonymous requests get a 401 before reaching these methods.
+ */
+#[Route('/me')]
 final class UserController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly SluggerInterface $slugger,
         private readonly ValidatorInterface $validator,
+        private readonly UserPresenter $presenter,
     ) {
     }
 
-    #[Route('/user', name: 'app_profile')]
-    public function index(): Response
+    #[Route('', name: 'api_me', methods: ['GET'])]
+    public function index(#[CurrentUser] User $user): JsonResponse
     {
-        return $this->render('user/profile.html.twig');
+        return $this->json(['data' => $this->presenter->present($user)]);
     }
 
-    #[Route('/user/profile-image', name: 'app_profile_upload_image', methods: ['POST'])]
-    public function uploadProfileImage(Request $request): Response
+    /**
+     * multipart/form-data with a "profile_picture" file field.
+     */
+    #[Route('/profile-picture', name: 'api_me_profile_picture', methods: ['POST'])]
+    public function uploadProfilePicture(#[CurrentUser] User $user, Request $request): JsonResponse
     {
         /** @var UploadedFile|null $file */
         $file = $request->files->get('profile_picture');
 
-        if (!$file) {
-            $this->addFlash('error', 'No file was uploaded.');
-
-            return $this->redirectToRoute('app_profile');
-        }
-
-        // file validation
-        $constraints = new Assert\Collection([
-            'profile_picture' => [
-                new Assert\NotNull(['message' => 'Please upload a file.']),
-                new Assert\File([
-                    'maxSize' => '5M',
-                    'mimeTypes' => ['image/jpeg', 'image/png', 'image/webp'],
-                    'mimeTypesMessage' => 'Please upload a valid image (JPEG, PNG, or WebP).',
-                ]),
-                new Assert\Image([
-                    'maxWidth' => 2000,
-                    'maxHeight' => 2000,
-                    'maxWidthMessage' => 'Image width cannot exceed {{ max_width }}px.',
-                    'maxHeightMessage' => 'Image height cannot exceed {{ max_height }}px.',
-                ]),
-            ],
+        $violations = $this->validator->validate($file, [
+            new Assert\NotNull(message: 'Please upload a file.'),
+            new Assert\Image(
+                maxSize: '5M',
+                mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+                mimeTypesMessage: 'Please upload a valid image (JPEG, PNG, or WebP).',
+                maxWidth: 2000,
+                maxHeight: 2000,
+                maxWidthMessage: 'Image width cannot exceed {{ max_width }}px.',
+                maxHeightMessage: 'Image height cannot exceed {{ max_height }}px.',
+            ),
         ]);
 
-        $violations = $this->validator->validate(['profile_picture' => $file], $constraints);
+        if (count($violations) > 0 || $file === null) {
+            $messages = array_map(
+                static fn (ConstraintViolationInterface $v) => ['propertyPath' => 'profile_picture', 'title' => (string) $v->getMessage()],
+                iterator_to_array($violations),
+            );
 
-        if (count($violations) > 0) {
-            foreach ($violations as $violation) {
-                $this->addFlash('error', $violation->getMessage());
-            }
-            return $this->redirectToRoute('app_profile');
+            return $this->json([
+                'title' => 'Validation Failed',
+                'status' => 422,
+                'detail' => implode("\n", array_column($messages, 'title')),
+                'violations' => array_values($messages),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
@@ -79,33 +86,34 @@ final class UserController extends AbstractController
 
         try {
             $file->move($uploadDir, $newFilename);
-        } catch (Exception) {
-            $this->addFlash('error', 'Failed to upload file. Please try again.');
-
-            return $this->redirectToRoute('app_profile');
+        } catch (FileException) {
+            return $this->json(
+                ['title' => 'Upload Failed', 'status' => 500, 'detail' => 'Failed to upload file. Please try again.'],
+                Response::HTTP_INTERNAL_SERVER_ERROR,
+            );
         }
 
-        $user = $this->getUser();
+        $this->removeOldProfilePicture($user, $uploadDir);
 
-        if ($user instanceof User) {
-            if ($user->getProfilePic() !== null && $user->getProfilePic() !== '') {
-                $oldPicPath = $this->getParameter('kernel.project_dir') . '/public' . $user->getProfilePic();
-                $realUploadDir = realpath($uploadDir);
+        $user->setProfilePic('/users/profilePics/' . $newFilename);
+        $this->entityManager->flush();
 
-                if ($realUploadDir && file_exists($oldPicPath)) {
-                    $realOldPicPath = realpath($oldPicPath);
+        return $this->json(['data' => $this->presenter->present($user)]);
+    }
 
-                    if ($realOldPicPath && str_starts_with($realOldPicPath, $realUploadDir)) {
-                        @unlink($oldPicPath);
-                    }
-                }
-            }
-
-            $user->setProfilePic('/users/profilePics/' . $newFilename);
-            $this->entityManager->flush();
-            $this->addFlash('success', 'Profile picture updated successfully!');
+    private function removeOldProfilePicture(User $user, string $uploadDir): void
+    {
+        if ($user->getProfilePic() === null || $user->getProfilePic() === '') {
+            return;
         }
 
-        return $this->redirectToRoute('app_profile');
+        $oldPicPath = $this->getParameter('kernel.project_dir') . '/public' . $user->getProfilePic();
+        $realUploadDir = realpath($uploadDir);
+        $realOldPicPath = realpath($oldPicPath);
+
+        // Only ever delete files inside the upload directory.
+        if ($realUploadDir && $realOldPicPath && str_starts_with($realOldPicPath, $realUploadDir . DIRECTORY_SEPARATOR)) {
+            @unlink($realOldPicPath);
+        }
     }
 }

@@ -1,0 +1,13 @@
+# Lets the Nuxt app (a different origin in dev: http://localhost:3000) call the
+# API from the browser with the session cookie attached.
+nelmio_cors:
+    defaults:
+        origin_regex: true
+        allow_origin: ['%env(CORS_ALLOW_ORIGIN)%']
+        allow_credentials: true
+        allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
+        allow_headers: ['Content-Type', 'Authorization', 'Accept']
+        max_age: 3600
+    paths:
+        '^/api/': ~
+        '^/media/': ~

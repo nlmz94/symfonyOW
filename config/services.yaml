@@ -9,8 +9,5 @@ services:
 
     App\:
         resource: '../src/'
-
-    # Event listeners
-    App\EventListener\SecurityHeadersListener:
-        tags:
-            - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+        exclude:
+            - '../src/Api/Dto/'

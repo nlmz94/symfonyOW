@@ -2,69 +2,89 @@
 
 namespace App\Controller;
 
+use App\Api\Dto\RegisterRequest;
+use App\Api\UserPresenter;
 use App\Entity\User;
-use App\Form\RegistrationFormType;
-use App\Validator\Constraints\StrongPassword;
+use App\Repository\UserRepository;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
+#[Route('/auth')]
 final class SecurityController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly UserPasswordHasherInterface $hasher
+        private readonly UserPasswordHasherInterface $hasher,
+        private readonly UserPresenter $presenter,
     ) {
     }
 
-    #[Route('/login', name: 'app_login')]
-    public function login(AuthenticationUtils $authUtils): Response
+    /**
+     * The json_login authenticator handles the credentials. Bad credentials never
+     * reach this method (the firewall answers 401); a successful login does, and
+     * gets the user back along with the session cookie.
+     */
+    #[Route('/login', name: 'api_auth_login', methods: ['POST'])]
+    public function login(#[CurrentUser] ?User $user): JsonResponse
     {
-        $error = $authUtils->getLastAuthenticationError();
-        $lastUsername = $authUtils->getLastUsername();
-
-        return $this->render('security/login.html.twig', [
-            'last_username' => $lastUsername,
-            'error' => $error,
-        ]);
-    }
-
-    #[Route('/logout', name: 'app_logout')]
-    public function logout(): void
-    {
-        // The firewall will intercept this. Never executed.
-    }
-
-    #[Route('/register', name: 'app_register')]
-    public function register(Request $request): Response
-    {
-        $user = new User();
-        $form = $this->createForm(RegistrationFormType::class, $user);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Hash the password
-            $hashedPassword = $this->hasher->hashPassword($user, $user->getPassword());
-            $user->setPassword($hashedPassword);
-
-            try {
-                $this->entityManager->persist($user);
-                $this->entityManager->flush();
-
-                $this->addFlash('success', 'Account created successfully! Please log in.');
-                return $this->redirectToRoute('app_login');
-            } catch (Exception) {
-                $this->addFlash('error', 'Registration failed. Email may already be in use.');
-            }
+        if ($user === null) {
+            return $this->json(
+                ['title' => 'Unauthorized', 'status' => 401, 'detail' => 'Missing credentials.'],
+                Response::HTTP_UNAUTHORIZED,
+            );
         }
 
-        return $this->render('security/register.html.twig', [
-            'registrationForm' => $form->createView(),
-        ]);
+        return $this->json(['data' => $this->presenter->present($user)]);
+    }
+
+    /**
+     * POST only, so a cross-site link or <img> cannot log the user out.
+     * The firewall intercepts it; see LogoutResponseListener for the response.
+     */
+    #[Route('/logout', name: 'api_auth_logout', methods: ['POST'])]
+    public function logout(): never
+    {
+        throw new \LogicException('Intercepted by the logout key on the main firewall.');
+    }
+
+    #[Route('/register', name: 'api_auth_register', methods: ['POST'])]
+    public function register(#[MapRequestPayload] RegisterRequest $payload, UserRepository $users): JsonResponse
+    {
+        if ($users->findOneBy(['email' => strtolower($payload->email)]) !== null) {
+            return $this->emailTaken();
+        }
+
+        $user = new User();
+        $user->setEmail($payload->email);
+        $user->setPassword($this->hasher->hashPassword($user, $payload->password));
+
+        try {
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+        } catch (UniqueConstraintViolationException) {
+            // Lost a race with a concurrent registration for the same email.
+            return $this->emailTaken();
+        }
+
+        return $this->json(['data' => $this->presenter->present($user)], Response::HTTP_CREATED);
+    }
+
+    private function emailTaken(): JsonResponse
+    {
+        return $this->json([
+            'title' => 'Validation Failed',
+            'status' => 422,
+            'detail' => 'This email is already registered.',
+            'violations' => [
+                ['propertyPath' => 'email', 'title' => 'This email is already registered.'],
+            ],
+        ], Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 }

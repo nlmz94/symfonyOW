@@ -2,37 +2,29 @@
 
 namespace App\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 
+#[AsEventListener(event: KernelEvents::RESPONSE)]
 final class SecurityHeadersListener
 {
-    public function onKernelResponse(ResponseEvent $event): void
+    public function __invoke(ResponseEvent $event): void
     {
         if (!$event->isMainRequest()) {
             return;
         }
 
-        $response = $event->getResponse();
+        $headers = $event->getResponse()->headers;
 
-        // Set security headers
-        $response->headers->set('X-Content-Type-Options', 'nosniff');
-        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
-        $response->headers->set('X-XSS-Protection', '1; mode=block');
-        $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
-        $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=(), camera=(), payment=()');
+        $headers->set('X-Content-Type-Options', 'nosniff');
+        $headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-        // Content Security Policy - adjust based on your needs
-        $csp = "default-src 'self'; " .
-               "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " .
-               "style-src 'self' 'unsafe-inline'; " .
-               "img-src 'self' data:; " .
-               "font-src 'self'; " .
-               "connect-src 'self'; " .
-               "frame-src 'none'; " .
-               "object-src 'none'; " .
-               "base-uri 'self'; " .
-               "form-action 'self';";
-
-        $response->headers->set('Content-Security-Policy', $csp);
+        // The API only ever returns JSON and images: nothing it serves should
+        // run scripts or be framed. The web profiler is left alone in dev.
+        if (!str_starts_with($event->getRequest()->getPathInfo(), '/_')) {
+            $headers->set('X-Frame-Options', 'DENY');
+            $headers->set('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none'");
+        }
     }
 }

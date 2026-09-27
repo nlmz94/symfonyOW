@@ -91,18 +91,6 @@ parameters:
 			path: src/Entity/User.php
 
 		-
-			message: '#^Class App\\Form\\RegistrationFormType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Form/RegistrationFormType.php
-
-		-
-			message: '#^Method App\\Repository\\AnimeRepository\:\:paginateAll\(\) should return array\{items\: list\<App\\Entity\\Anime\>, total\: int, pages\: int, page\: int, limit\: int\} but returns array\{animes\: list\<mixed\>, total\: int\<0, max\>, pages\: int, page\: int, limit\: int\|null\}\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Repository/AnimeRepository.php
-
-		-
 			message: '#^Method App\\Validator\\Constraints\\StrongPasswordValidator\:\:validate\(\) has parameter \$value with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1

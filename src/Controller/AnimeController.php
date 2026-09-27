@@ -2,29 +2,53 @@
 
 namespace App\Controller;
 
-use App\Entity\Anime;
+use App\Api\AnimePresenter;
 use App\Repository\AnimeRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[Route('/animes')]
 final class AnimeController extends AbstractController
 {
-    #[Route('/anime', name: 'app_anime')]
-    public function index(Request $request, AnimeRepository $repo): Response
-    {
-        $page  = max(1, $request->query->getInt('page', 1));
-        $searchTerm = $request->query->get('searchTerm');
-        $data = $repo->paginateAll($page, $searchTerm);
-
-        return $this->render('anime/index.html.twig', $data);
+    public function __construct(
+        private readonly AnimeRepository $repo,
+        private readonly AnimePresenter $presenter,
+    ) {
     }
 
-    #[Route('/anime/{id<\d+>}', name: 'anime_show', methods: ['GET'])]
-    public function show(Anime $anime): Response
+    /**
+     * GET /api/animes?page=1&limit=50&searchTerm=naruto
+     */
+    #[Route('', name: 'api_anime_index', methods: ['GET'])]
+    public function index(Request $request): JsonResponse
     {
-        $response = $this->render('anime/show.html.twig', ['anime' => $anime]);
+        $searchTerm = $request->query->getString('searchTerm');
+        $result = $this->repo->paginateAll(
+            $request->query->getInt('page', 1),
+            $searchTerm !== '' ? $searchTerm : null,
+            $request->query->getInt('limit', 50),
+        );
+
+        return $this->json([
+            'data' => array_map($this->presenter->summary(...), $result['items']),
+            'meta' => [
+                'total' => $result['total'],
+                'pages' => $result['pages'],
+                'page' => $result['page'],
+                'limit' => $result['limit'],
+            ],
+        ]);
+    }
+
+    #[Route('/{id<\d+>}', name: 'api_anime_show', methods: ['GET'])]
+    public function show(int $id): JsonResponse
+    {
+        $anime = $this->repo->findDetail($id) ?? throw new NotFoundHttpException('Anime not found.');
+
+        $response = $this->json(['data' => $this->presenter->detail($anime)]);
         $response->setPublic();
         $response->setMaxAge(3600);
         $response->setSharedMaxAge(86400);
