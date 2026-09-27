@@ -1,10 +1,310 @@
 parameters:
 	ignoreErrors:
 		-
+			message: '#^Cannot call method getPathname\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Command/LiipWarmupCommand.php
+
+		-
+			message: '#^Cannot call method isFile\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Command/LiipWarmupCommand.php
+
+		-
 			message: '#^Property App\\Command\\LiipWarmupCommand\:\:\$filters type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Command/LiipWarmupCommand.php
+
+		-
+			message: '#^Cannot access offset ''color'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Cannot access offset ''edges'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Cannot access offset ''english'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Cannot access offset ''extraLarge'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Cannot access offset ''full'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Cannot access offset ''id'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 4
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Cannot access offset ''image'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Cannot access offset ''languageV2'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Cannot access offset ''large'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Cannot access offset ''name'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Cannot access offset ''native'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Cannot access offset ''romaji'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Cannot access offset ''site'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Cannot access offset 0 on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 11
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 8
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$d of method App\\Command\\ScrapeAniListCommand\:\:parseFuzzyDate\(\) expects array\{year\: int\|null, month\: int\|null, day\: int\|null\}\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$episodes of method App\\Entity\\Anime\:\:setEpisodes\(\) expects int\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$old of method App\\Entity\\Anime\:\:setOldImgUrl\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$s of method App\\Command\\ScrapeAniListCommand\:\:truncate\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$string of function strip_tags expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$title of method App\\Entity\\Anime\:\:setTitle\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$titleEnglish of method App\\Entity\\Anime\:\:setTitleEnglish\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$v of method App\\Entity\\Anime\:\:setAverageScore\(\) expects int\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$v of method App\\Entity\\Anime\:\:setCountryOfOrigin\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$v of method App\\Entity\\Anime\:\:setCoverColor\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$v of method App\\Entity\\Anime\:\:setDuration\(\) expects int\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$v of method App\\Entity\\Anime\:\:setFavourites\(\) expects int\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$v of method App\\Entity\\Anime\:\:setFormat\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$v of method App\\Entity\\Anime\:\:setMeanScore\(\) expects int\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$v of method App\\Entity\\Anime\:\:setOldBannerUrl\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$v of method App\\Entity\\Anime\:\:setPopularity\(\) expects int\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$v of method App\\Entity\\Anime\:\:setSeason\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$v of method App\\Entity\\Anime\:\:setSeasonYear\(\) expects int\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$v of method App\\Entity\\Anime\:\:setSource\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$v of method App\\Entity\\Anime\:\:setStatus\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$v of method App\\Entity\\Anime\:\:setTitleNative\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$v of method App\\Entity\\Anime\:\:setTitleRomaji\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$v of method App\\Entity\\AnimeCharacter\:\:setRole\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$v of method App\\Entity\\Character\:\:setOldImageUrl\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#1 \$v of method App\\Entity\\Staff\:\:setOldImageUrl\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#2 \$edges of method App\\Command\\ScrapeAniListCommand\:\:syncCharacters\(\) expects array\<int, array\<string, mixed\>\>, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#2 \$edges of method App\\Command\\ScrapeAniListCommand\:\:syncStaff\(\) expects array\<int, array\<string, mixed\>\>, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#2 \$edges of method App\\Command\\ScrapeAniListCommand\:\:syncStudios\(\) expects array\<int, array\<string, mixed\>\>, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#2 \$genreNames of method App\\Command\\ScrapeAniListCommand\:\:syncGenres\(\) expects array\<int, string\>, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#2 \$node of method App\\Command\\ScrapeAniListCommand\:\:getOrCreateCharacter\(\) expects array\<string, mixed\>, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Parameter \#2 \.\.\.\$values of function sprintf expects bool\|float\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
+
+		-
+			message: '#^Property App\\Command\\ScrapeAniListCommand\:\:\$stats \(array\{inserted\: int, updated\: int, skipped\: int, errors\: int\}\) does not accept non\-empty\-array\<string, int\>\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Command/ScrapeAniListCommand.php
 
 		-
 			message: '#^Property App\\Entity\\Anime\:\:\$genres type mapping mismatch\: property can contain Doctrine\\Common\\Collections\\Collection but database expects Doctrine\\Common\\Collections\\Collection&iterable\<App\\Entity\\Genre\>\.$#'
@@ -41,6 +341,12 @@ parameters:
 			identifier: missingType.generics
 			count: 1
 			path: src/Entity/Anime.php
+
+		-
+			message: '#^Method App\\Entity\\User\:\:getUserIdentifier\(\) should return non\-empty\-string but returns string\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Entity/User.php
 
 		-
 			message: '#^Method App\\Entity\\User\:\:setRoles\(\) has parameter \$roles with no value type specified in iterable type array\.$#'
