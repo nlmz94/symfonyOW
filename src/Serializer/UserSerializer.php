@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Api;
+namespace App\Serializer;
 
 use App\Entity\User;
 
-final readonly class UserPresenter
+final readonly class UserSerializer
 {
     private const string DEFAULT_PROFILE_PIC = '/images/defaultProfileImage.png';
 
@@ -12,8 +12,12 @@ final readonly class UserPresenter
     {
     }
 
-    /** @return array<string, mixed> */
-    public function present(User $user): array
+    /**
+     * The signed-in user's own account: login, register, GET /api/me, profile picture upload.
+     *
+     * @return array<string, mixed>
+     */
+    public function accountSerialize(User $user): array
     {
         return [
             'id' => $user->getId(),

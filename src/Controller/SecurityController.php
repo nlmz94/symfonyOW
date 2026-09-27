@@ -2,10 +2,10 @@
 
 namespace App\Controller;
 
-use App\Api\Dto\RegisterRequest;
-use App\Api\UserPresenter;
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Serializer\RegisterRequest;
+use App\Serializer\UserSerializer;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,7 +22,7 @@ final class SecurityController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly UserPasswordHasherInterface $hasher,
-        private readonly UserPresenter $presenter,
+        private readonly UserSerializer $userSerializer,
     ) {
     }
 
@@ -41,7 +41,7 @@ final class SecurityController extends AbstractController
             );
         }
 
-        return $this->json(['data' => $this->presenter->present($user)]);
+        return $this->json(['data' => $this->userSerializer->accountSerialize($user)]);
     }
 
     /**
@@ -73,7 +73,7 @@ final class SecurityController extends AbstractController
             return $this->emailTaken();
         }
 
-        return $this->json(['data' => $this->presenter->present($user)], Response::HTTP_CREATED);
+        return $this->json(['data' => $this->userSerializer->accountSerialize($user)], Response::HTTP_CREATED);
     }
 
     private function emailTaken(): JsonResponse

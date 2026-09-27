@@ -24,7 +24,7 @@ run locally.
 |------------|------------------------|-----------------------------------------------|
 | `php`      | built, PHP 8.5-FPM     | app + CLI; runs composer install and schema setup on boot |
 | `nginx`    | `nginx:1.29-alpine`    | front controller on port 8000                 |
-| `database` | `mariadb:11.4`         | MySQL-protocol DB, seeded with `onlyweebs_test` too |
+| `database` | `mariadb:11.4`         | MySQL-protocol DB                             |
 
 PHP extensions installed: `pdo_mysql`, `intl`, `gd` (with WebP — required by the
 `*_webp` Liip filter sets), `exif`, `zip`, `opcache`, `xdebug`.
@@ -39,7 +39,7 @@ docker compose exec database mariadb -uapp -papp onlyweebs
 docker compose down -v && docker compose up -d   # wipe DB and start over
 ```
 
-`make up`, `make sh`, `make dbsh`, `make dc-test`, `make fresh` wrap these if you
+`make up`, `make sh`, `make dbsh`, `make fresh` wrap these if you
 have `make` available (it is not installed on Windows by default).
 
 ## Config notes

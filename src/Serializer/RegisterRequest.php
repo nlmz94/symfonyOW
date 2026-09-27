@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Api\Dto;
+namespace App\Serializer;
 
 use App\Validator\Constraints\StrongPassword;
 use Symfony\Component\Validator\Constraints as Assert;

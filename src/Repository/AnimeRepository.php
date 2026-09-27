@@ -35,7 +35,7 @@ class AnimeRepository extends ServiceEntityRepository
 
         if ($searchTerm !== null && $searchTerm !== '') {
             $qb->andWhere('LOWER(a.title) LIKE LOWER(:searchTerm) OR LOWER(a.titleEnglish) LIKE LOWER(:searchTerm)')
-                ->setParameter('searchTerm', '%'.$searchTerm.'%');
+                ->setParameter('searchTerm', '%'.addcslashes($searchTerm, '%_\\').'%');
         }
 
         $query = $qb->getQuery();
@@ -51,7 +51,7 @@ class AnimeRepository extends ServiceEntityRepository
             'items' => $items,
             'total' => $total,
             'pages' => $pages,
-            'page'  => min($page, $pages),
+            'page'  => $page,
             'limit' => $limit,
         ];
     }
@@ -138,7 +138,7 @@ class AnimeRepository extends ServiceEntityRepository
     }
 
     /**
-     * Everything AnimePresenter::summary() touches, fetch-joined.
+     * Everything AnimeSerializer::baseSerialize() touches, fetch-joined.
      */
     private function createListQueryBuilder(): QueryBuilder
     {

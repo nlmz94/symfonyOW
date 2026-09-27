@@ -10,11 +10,6 @@
 ###< symfony/framework-bundle ###
 /.idea
 
-###> phpunit/phpunit ###
-/phpunit.xml
-/.phpunit.cache/
-###< phpunit/phpunit ###
-
 /public/images/animes/
 /public/images/.DS_Store
 /public/users/profilePics/

@@ -2,10 +2,10 @@
 
 namespace App\Controller;
 
-use App\Api\AnimePresenter;
 use App\Repository\AnimeRepository;
 use App\Repository\GenreRepository;
 use App\Repository\StudioRepository;
+use App\Serializer\AnimeSerializer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
@@ -20,7 +20,7 @@ final class HomeController extends AbstractController
         AnimeRepository $animes,
         GenreRepository $genres,
         StudioRepository $studios,
-        AnimePresenter $presenter,
+        AnimeSerializer $animeSerializer,
     ): JsonResponse {
         $response = $this->json([
             'data' => [
@@ -29,9 +29,9 @@ final class HomeController extends AbstractController
                     'genres' => $genres->count(),
                     'studios' => $studios->count(),
                 ],
-                'trending' => array_map($presenter->summary(...), $animes->findTrending()),
-                'topRated' => array_map($presenter->summary(...), $animes->findTopRated()),
-                'recent' => array_map($presenter->summary(...), $animes->findRecentlyAired()),
+                'trending' => array_map($animeSerializer->frontPageSerialize(...), $animes->findTrending()),
+                'topRated' => array_map($animeSerializer->frontPageSerialize(...), $animes->findTopRated()),
+                'recent' => array_map($animeSerializer->frontPageSerialize(...), $animes->findRecentlyAired()),
             ],
         ]);
         $response->setPublic();

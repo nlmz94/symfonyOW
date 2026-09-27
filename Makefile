@@ -79,7 +79,7 @@ GID ?= $(shell id -g 2>/dev/null || echo 1000)
 export UID
 export GID
 
-.PHONY: up down restart rebuild dc-logs sh dbsh console dc-stan dc-test fresh xdebug
+.PHONY: up down restart rebuild dc-logs sh dbsh console dc-stan fresh xdebug
 
 up:
 	$(DC) up -d --build
@@ -114,9 +114,6 @@ console:
 
 dc-stan:
 	$(DC) exec -u www-data php vendor/bin/phpstan analyse --memory-limit=1G
-
-dc-test:
-	$(DC) exec -u www-data -e APP_ENV=test php vendor/bin/phpunit
 
 # Destroys the database and var volumes, then rebuilds.
 fresh:

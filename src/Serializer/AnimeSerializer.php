@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Api;
+namespace App\Serializer;
 
 use App\Entity\Anime;
 use App\Entity\AnimeCharacter;
@@ -9,54 +9,41 @@ use App\Entity\Genre;
 use App\Entity\Producer;
 use App\Entity\Studio;
 
-/**
- * JSON shape of anime resources. Kept as explicit arrays rather than serializer
- * groups so the contract the Nuxt app depends on is visible in one place.
- */
-final readonly class AnimePresenter
+final readonly class AnimeSerializer
 {
     public function __construct(private ImageUrlGenerator $images)
     {
     }
 
     /**
-     * Light shape for lists and cards.
+     * GET /api/animes results.
      *
      * @return array<string, mixed>
      */
-    public function summary(Anime $anime): array
+    public function searchSerialize(Anime $anime): array
     {
-        return [
-            'id' => $anime->getId(),
-            'title' => $anime->getTitle(),
-            'titleEnglish' => $anime->getTitleEnglish(),
-            'format' => $anime->getFormat(),
-            'status' => $anime->getStatus(),
-            'episodes' => $anime->getEpisodes(),
-            'season' => $anime->getSeason(),
-            'seasonYear' => $anime->getSeasonYear(),
-            'averageScore' => $anime->getAverageScore(),
-            'popularity' => $anime->getPopularity(),
-            'isAdult' => $anime->isAdult(),
-            'pegi' => $anime->getPegi()?->getPegi(),
-            'coverColor' => $anime->getCoverColor(),
-            'genres' => array_map(static fn (Genre $g) => $g->getName(), $anime->getGenres()->toArray()),
-            'images' => [
-                'thumb' => $this->images->filtered($anime->getImgUrl(), 'thumb'),
-                'poster' => $this->images->filtered($anime->getImgUrl(), 'poster'),
-            ],
-        ];
+        return $this->baseSerialize($anime);
     }
 
     /**
-     * Full shape for the detail page.
+     * GET /api/home sections (trending, top rated, recent).
      *
      * @return array<string, mixed>
      */
-    public function detail(Anime $anime): array
+    public function frontPageSerialize(Anime $anime): array
+    {
+        return $this->baseSerialize($anime);
+    }
+
+    /**
+     * GET /api/animes/{id}.
+     *
+     * @return array<string, mixed>
+     */
+    public function detailSerialize(Anime $anime): array
     {
         return [
-            ...$this->summary($anime),
+            ...$this->baseSerialize($anime),
             'anilistId' => $anime->getAnilistId(),
             'malId' => $anime->getMalId(),
             'titleRomaji' => $anime->getTitleRomaji(),
@@ -82,13 +69,38 @@ final readonly class AnimePresenter
                 static fn (Studio $s) => ['id' => $s->getId(), 'name' => $s->getName()],
                 $anime->getStudios()->toArray(),
             ),
-            'characters' => array_map($this->character(...), $anime->getCharacters()->toArray()),
-            'staff' => array_map($this->staff(...), $anime->getStaff()->toArray()),
+            'characters' => array_map($this->characterSerialize(...), $anime->getCharacters()->toArray()),
+            'staff' => array_map($this->staffSerialize(...), $anime->getStaff()->toArray()),
         ];
     }
 
     /** @return array<string, mixed> */
-    private function character(AnimeCharacter $link): array
+    private function baseSerialize(Anime $anime): array
+    {
+        return [
+            'id' => $anime->getId(),
+            'title' => $anime->getTitle(),
+            'titleEnglish' => $anime->getTitleEnglish(),
+            'format' => $anime->getFormat(),
+            'status' => $anime->getStatus(),
+            'episodes' => $anime->getEpisodes(),
+            'season' => $anime->getSeason(),
+            'seasonYear' => $anime->getSeasonYear(),
+            'averageScore' => $anime->getAverageScore(),
+            'popularity' => $anime->getPopularity(),
+            'isAdult' => $anime->isAdult(),
+            'pegi' => $anime->getPegi()?->getPegi(),
+            'coverColor' => $anime->getCoverColor(),
+            'genres' => array_map(static fn (Genre $g) => $g->getName(), $anime->getGenres()->toArray()),
+            'images' => [
+                'thumb' => $this->images->filtered($anime->getImgUrl(), 'thumb'),
+                'poster' => $this->images->filtered($anime->getImgUrl(), 'poster'),
+            ],
+        ];
+    }
+
+    /** @return array<string, mixed> */
+    private function characterSerialize(AnimeCharacter $link): array
     {
         $character = $link->getCharacter();
         $va = $link->getVoiceActor();
@@ -109,7 +121,7 @@ final readonly class AnimePresenter
     }
 
     /** @return array<string, mixed> */
-    private function staff(AnimeStaff $link): array
+    private function staffSerialize(AnimeStaff $link): array
     {
         $staff = $link->getStaff();
 

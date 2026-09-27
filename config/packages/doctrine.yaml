@@ -51,11 +51,6 @@ framework:
             doctrine.second_level_cache_pool:
                 adapter: cache.app
 
-when@test:
-    doctrine:
-        dbal:
-            dbname_suffix: '_test%env(default::TEST_TOKEN)%'
-
 when@prod:
     doctrine:
         orm:

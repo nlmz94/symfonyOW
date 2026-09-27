@@ -64,9 +64,4 @@ class Studio
         $this->animes->removeElement($anime);
         return $this;
     }
-
-    public function __toString(): string
-    {
-        return (string)$this->name;
-    }
 }

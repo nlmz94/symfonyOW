@@ -10,4 +10,4 @@ services:
     App\:
         resource: '../src/'
         exclude:
-            - '../src/Api/Dto/'
+            - '../src/Serializer/RegisterRequest.php'

@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Api\UserPresenter;
 use App\Entity\User;
+use App\Serializer\UserSerializer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -29,14 +29,14 @@ final class UserController extends AbstractController
         private readonly EntityManagerInterface $entityManager,
         private readonly SluggerInterface $slugger,
         private readonly ValidatorInterface $validator,
-        private readonly UserPresenter $presenter,
+        private readonly UserSerializer $userSerializer,
     ) {
     }
 
     #[Route('', name: 'api_me', methods: ['GET'])]
     public function index(#[CurrentUser] User $user): JsonResponse
     {
-        return $this->json(['data' => $this->presenter->present($user)]);
+        return $this->json(['data' => $this->userSerializer->accountSerialize($user)]);
     }
 
     /**
@@ -45,8 +45,8 @@ final class UserController extends AbstractController
     #[Route('/profile-picture', name: 'api_me_profile_picture', methods: ['POST'])]
     public function uploadProfilePicture(#[CurrentUser] User $user, Request $request): JsonResponse
     {
-        /** @var UploadedFile|null $file */
         $file = $request->files->get('profile_picture');
+        $file = $file instanceof UploadedFile ? $file : null;
 
         $violations = $this->validator->validate($file, [
             new Assert\NotNull(message: 'Please upload a file.'),
@@ -98,7 +98,7 @@ final class UserController extends AbstractController
         $user->setProfilePic('/users/profilePics/' . $newFilename);
         $this->entityManager->flush();
 
-        return $this->json(['data' => $this->presenter->present($user)]);
+        return $this->json(['data' => $this->userSerializer->accountSerialize($user)]);
     }
 
     private function removeOldProfilePicture(User $user, string $uploadDir): void

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Api;
+namespace App\Serializer;
 
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Symfony\Component\HttpFoundation\RequestStack;

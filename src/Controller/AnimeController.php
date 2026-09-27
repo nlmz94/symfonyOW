@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Api\AnimePresenter;
 use App\Repository\AnimeRepository;
+use App\Serializer\AnimeSerializer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,7 +15,7 @@ final class AnimeController extends AbstractController
 {
     public function __construct(
         private readonly AnimeRepository $repo,
-        private readonly AnimePresenter $presenter,
+        private readonly AnimeSerializer $animeSerializer,
     ) {
     }
 
@@ -33,7 +33,7 @@ final class AnimeController extends AbstractController
         );
 
         return $this->json([
-            'data' => array_map($this->presenter->summary(...), $result['items']),
+            'data' => array_map($this->animeSerializer->searchSerialize(...), $result['items']),
             'meta' => [
                 'total' => $result['total'],
                 'pages' => $result['pages'],
@@ -48,7 +48,7 @@ final class AnimeController extends AbstractController
     {
         $anime = $this->repo->findDetail($id) ?? throw new NotFoundHttpException('Anime not found.');
 
-        $response = $this->json(['data' => $this->presenter->detail($anime)]);
+        $response = $this->json(['data' => $this->animeSerializer->detailSerialize($anime)]);
         $response->setPublic();
         $response->setMaxAge(3600);
         $response->setSharedMaxAge(86400);

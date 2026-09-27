@@ -38,6 +38,8 @@ COPY docker/php/conf.d/ /usr/local/etc/php/conf.d/
 COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint
 RUN chmod +x /usr/local/bin/entrypoint
 
+RUN git config --system --add safe.directory /app
+
 ENV COMPOSER_HOME=/tmp/composer \
     COMPOSER_ALLOW_SUPERUSER=1
 

@@ -13,6 +13,7 @@ chown -R www-data:www-data var public/media public/users public/images 2>/dev/nu
 # Reinstall only when the lockfile moved ahead of the last install.
 if [ ! -f vendor/autoload_runtime.php ] || [ composer.lock -nt vendor/.install-stamp ]; then
     echo "[entrypoint] composer install"
+    rm -rf var/cache/*
     as_app composer install --no-interaction --prefer-dist
     as_app touch vendor/.install-stamp
 fi
